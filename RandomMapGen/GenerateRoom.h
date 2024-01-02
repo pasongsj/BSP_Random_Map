@@ -28,12 +28,12 @@ public:
 		max_rate = _Max;
 	}
 
-	static void CreateMap(std::vector<std::vector<int>> _Map, int _maxdepth);
+	static void CreateMap(std::vector<std::vector<int>> _Map, int roomcnt, int _size);
 
 	static void SetWallDFS(int x, int y, std::vector<std::vector<bool>>& _isvisited);
 	static bool In_range(int x, int y,int n,int m);
 
-	static void Divide(Node* tree,int n);
+	static void Divide(Node* tree,int n, int _size);
 	static void DrawLine(Vector2 from, Vector2 to,int n); //from->to로 이어지는 선을 그리게 될 것이다.
 	static void Print();
 
@@ -44,7 +44,7 @@ protected:
 private:
 	static float min_rate;
 	static float max_rate;
-	static int maxdepth;
 	static std::vector<std::vector<int>> Map;
+	static int door_size;
 };
 

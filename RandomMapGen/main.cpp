@@ -17,7 +17,7 @@ int main()
 	Map[33][22] = -1;
 	Map[56][2] = -1;
 	Map[8][2] = -1;
-	GenerateRoom::CreateMap(Map, 10);
+	GenerateRoom::CreateMap(Map, 50,5);
 	GenerateRoom::Print();
 
 	

@@ -10,7 +10,8 @@ GenerateRoom* GenerateRoom::Room = nullptr;
 
 float GenerateRoom::min_rate = 0.4f;
 float GenerateRoom::max_rate = 0.6f;
-int GenerateRoom::maxdepth = 0;
+int GenerateRoom::door_size = 2;
+
 std::vector<std::vector<int>> GenerateRoom::Map;
 
 
@@ -36,8 +37,8 @@ void GenerateRoom::SetWallDFS(int x, int y, std::vector<std::vector<bool>>& _isv
     _isvisited[x][y] = true;
 	const int dx[4] = { 0,0,1,-1 };
 	const int dy[4] = { 1,-1,0,0 };
-    int n = _isvisited.size()-1;
-    int m = _isvisited[0].size()-1;
+    int n = static_cast<int>(_isvisited.size()-1);
+    int m = static_cast<int>(_isvisited[0].size()-1);
     while (!dfsq.empty())
     {
         int cx, cy;
@@ -66,12 +67,11 @@ void GenerateRoom::SetWallDFS(int x, int y, std::vector<std::vector<bool>>& _isv
 }
 
 
-void GenerateRoom::CreateMap(std::vector<std::vector<int>> _Map, int _maxdepth)
+void GenerateRoom::CreateMap(std::vector<std::vector<int>> _Map, int roomcnt, int _size)
 {
     Map = _Map;
-    maxdepth = _maxdepth;
-    int lx = Map.size();
-    int ly = Map[0].size();
+    int lx = static_cast<int>(Map.size());
+    int ly = static_cast<int>(Map[0].size());
 
     std::vector<std::vector<bool>> isvisited(lx, std::vector<bool>(ly, false));
 
@@ -96,11 +96,11 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>> _Map, int _maxdepth)
     }
 
     Node* RootNode = new Node({1, 1, static_cast<int>(Map.size()-1), static_cast<int>(Map[0].size()-1)});
-    Divide(RootNode, _maxdepth);
+    Divide(RootNode, roomcnt, _size);
 }
 
 
-void GenerateRoom::Divide(Node* tree, int n)
+void GenerateRoom::Divide(Node* tree, int n, int _size)
 {
     if (n == 1) return; //내가 원하는 높이에 도달하면 더 나눠주지 않는다.
     //그 외의 경우에는
@@ -123,9 +123,26 @@ void GenerateRoom::Divide(Node* tree, int n)
     //나올 수 있는 최대 길이와 최소 길이중에서 랜덤으로 한 값을 선택
 
     RectInt curRect = tree->nodeRect;
+    int leftnodecnt = n / 2;
+    int rightnodecnt = n - leftnodecnt;
+    int max_room_size = (_size + 1) * 2;
 
     if (curRect.width >= curRect.height) //가로가 더 길었던 경우에는 좌 우로 나누게 될 것이며, 이 경우에는 세로 길이는 변하지 않는다.
     {
+        if(n>2)
+        {
+            while (max_room_size * leftnodecnt > split * curRect.height)
+            {
+                split++;
+            }
+            if (split > curRect.width || max_room_size * rightnodecnt > (curRect.width - split) * curRect.height)
+            {
+                printf("ERRRRRRRR");
+                return;
+            }
+        }
+        // 방의 최소 크기를 맞추기 위함이다.
+
         tree->leftNode = new Node({ curRect.x, curRect.y, split, curRect.height});
         //왼쪽 노드에 대한 정보다 
         //위치는 좌측 하단 기준이므로 변하지 않으며, 가로 길이는 위에서 구한 랜덤값을 넣어준다.
@@ -139,6 +156,20 @@ void GenerateRoom::Divide(Node* tree, int n)
     }
     else
     {
+        if (n > 2)
+        {
+            while ((_size + 1) * 2 * n > split * curRect.width)
+            {
+                split++;
+            }
+            if (split > curRect.height || max_room_size * rightnodecnt > (curRect.height - split) * curRect.width)
+            {
+                printf("ERRRRRRRR");
+                return;
+            }
+        }
+        // 방의 최소 크기를 맞추기 위함이다.
+
         tree->leftNode = new Node({ curRect.x, curRect.y, curRect.width, split });
         tree->rightNode = new Node({ curRect.x, curRect.y + split, curRect.width, curRect.height - split });
 		DrawLine({ curRect.x, curRect.y + split }, { curRect.x + curRect.width, curRect.y + split }, n);
@@ -146,8 +177,8 @@ void GenerateRoom::Divide(Node* tree, int n)
     }
     tree->leftNode->parNode = tree; //자식노드들의 부모노드를 나누기전 노드로 설정
     tree->rightNode->parNode = tree;
-	Divide(tree->leftNode, n/2); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
-	Divide(tree->rightNode, n -(n / 2));//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+	Divide(tree->leftNode, leftnodecnt,_size); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+	Divide(tree->rightNode, rightnodecnt, _size);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
 }
 
 
@@ -169,7 +200,15 @@ void GenerateRoom::DrawLine(Vector2 from, Vector2 to,int n) //from->to로 이어지�
 				Map[from.x][starty] = 1;
             }
         }
-        Map[from.x][doorPos] = 2;
+        //Map[from.x][doorPos] = 2;
+
+        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
+        {
+            if (Map[from.x][i] != -1)
+            {
+                Map[from.x][i] = 2;
+            }
+        }
     }
     else if (from.y == to.y)
     {
@@ -185,7 +224,14 @@ void GenerateRoom::DrawLine(Vector2 from, Vector2 to,int n) //from->to로 이어지�
                 Map[startx][from.y] = 1;
             }
         }
-        Map[doorPos][from.y] = 2;
+
+        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size&1); ++i)
+        {
+            if (Map[i][from.y] != -1)
+            {
+                Map[i][from.y] = 2;
+            }
+        }
     }
 
 
