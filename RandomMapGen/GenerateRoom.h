@@ -40,7 +40,7 @@ private:
 	static bool In_range(int x, int y);
 
 	static void Divide(std::vector<std::vector<int>>& _Map, Node* tree,int n, int _size, float _rate);
-	static void DrawLine(std::vector<std::vector<int>>& _Map, Vector2 from, Vector2 to,int n); //from->to로 이어지는 선을 그리게 될 것이다.
+	static void DrawLine(std::vector<std::vector<int>>& _Map, const RectInt& _cur, int splite, bool is_height, int n); //from->to로 이어지는 선을 그리게 될 것이다.
 	static int GetRoomSize(const RectInt Rectinfo);
 	static void CalMapSizeIndex(const std::vector<std::vector<int>>& Map, std::vector<std::vector<int>>& MapIndex);
 
@@ -60,11 +60,12 @@ private:
 	static void GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right);
 
 
-	static void Init();
+	static void Init(const std::vector<std::vector<int>>& _Map);
 
 
 	static std::vector<std::vector<bool>> isvisited;
 	static std::vector<std::vector<int>>  MapSizeIndex;
+	static std::vector<std::vector<int>>  TryMap;
 
 
 	static int lx;
@@ -77,5 +78,6 @@ private:
 	static float max_rate;
 	//static std::vector<std::vector<int>> MapSizeIndex;
 	static int door_size;
+	static float Rate;
 };
 

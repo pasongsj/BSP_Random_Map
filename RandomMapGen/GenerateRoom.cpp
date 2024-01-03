@@ -11,10 +11,12 @@ GenerateRoom* GenerateRoom::Room = nullptr;
 float GenerateRoom::min_rate = 0.9f;
 float GenerateRoom::max_rate = 1.1f;
 int GenerateRoom::door_size = 1;
+float GenerateRoom::Rate = 1.0f;
 
 
 std::vector<std::vector<bool>> GenerateRoom::isvisited;
 std::vector<std::vector<int>>  GenerateRoom::MapSizeIndex;
+std::vector<std::vector<int>>  GenerateRoom::TryMap;
 
 int GenerateRoom::lx = 0;
 int GenerateRoom::ly = 0;
@@ -31,18 +33,21 @@ GenerateRoom::~GenerateRoom()
 {
 }
 
-void GenerateRoom::Init()
+void GenerateRoom::Init(const std::vector<std::vector<int>>& _Map)
 {
     isvisited.resize(lx);
     MapSizeIndex.resize(lx);
+    TryMap.resize(lx);
     for (int i = 0; i < lx; ++i)
     {
         isvisited[i].resize(ly);
         MapSizeIndex[i].resize(ly);
+        TryMap[i].resize(ly);
         for (int j = 0; j < ly; ++j)
         {
             isvisited[i][j] = false;
             isvisited[i][j] = 0;
+            TryMap[i][j] = _Map[i][j];
         }
     }
 }
@@ -116,7 +121,7 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>>& _Map, int roomcnt, i
     lx = static_cast<int>(_Map.size());
     ly = static_cast<int>(_Map[0].size());
 
-    Init();
+    Init(_Map);
 
     // 맵이 없는 부분(-1)확인,
     for (int i = 0; i < lx; ++i)
@@ -139,11 +144,16 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>>& _Map, int roomcnt, i
         }
     }
 
+    Rate = 0.83f;
     CalMapSizeIndex(_Map, MapSizeIndex);
     Node* RootNode = new Node({1, 1, lx -1, ly -1});
     float _rate = static_cast<float>(GetRoomSize(RootNode->nodeRect)) / ((_size + 1) * 2 * roomcnt);
-	Divide(_Map, RootNode, roomcnt, _size, _rate * 0.9f);
+    _rate = _rate * Rate < 1.0f ? 1.0f : _rate * Rate;
+	Divide(_Map, RootNode, roomcnt, _size, _rate);
 }
+
+
+
 void GenerateRoom::GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right)
 {
     if (true == is_height)
@@ -188,48 +198,22 @@ void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n
     GetChildRect(curRect, split, is_height, LeftRect, RightRect);
 
     int leftSize = GetRoomSize(LeftRect);
-    int rightSize = GetRoomSize(RightRect);;
+    int rightSize = GetRoomSize(RightRect);
+    if (leftSize == 0)
+    {
+        tree->rightNode = new Node(RightRect);
+        tree->rightNode->parNode = tree;
+        Divide(_Map, tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return;
+    }
+    else if (rightSize == 0)
+    {
+        tree->leftNode = new Node(LeftRect);
+        tree->leftNode->parNode = tree;
+        Divide(_Map, tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return;
+    }
 
-    if (curRect.height >= curRect.width) //가로가 더 길었던 경우
-    {
-        //maxLength = tree->nodeRect.height;
-        leftSize= GetRoomSize({ curRect.x, curRect.y, split, curRect.width });
-        rightSize = GetRoomSize({ curRect.x + split + 1, curRect.y, curRect.height - split - 1, curRect.width });
-        if (leftSize == 0)
-        {
-            tree->rightNode = new Node({ curRect.x + split + 1, curRect.y, curRect.height - split - 1, curRect.width });
-            tree->rightNode->parNode = tree;
-            Divide(_Map, tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-            return;
-        }
-        else if (rightSize == 0)
-        {
-            tree->leftNode = new Node({ curRect.x, curRect.y, split, curRect.width });
-            tree->leftNode->parNode = tree;
-            Divide(_Map, tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-            return;
-        }
-    }
-    else
-    {
-        //maxLength = tree->nodeRect.width;
-        leftSize = GetRoomSize({ curRect.x, curRect.y, curRect.height, split });
-        rightSize = GetRoomSize({ curRect.x, curRect.y + split + 1, curRect.height, curRect.width - split - 1 });
-        if (leftSize == 0)
-        {
-            tree->rightNode = new Node({ curRect.x, curRect.y + split + 1, curRect.height, curRect.width - split - 1 });
-            tree->rightNode->parNode = tree;
-            Divide(_Map, tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-            return;
-        }
-        else if (rightSize == 0)
-        {
-            tree->leftNode = new Node({ curRect.x, curRect.y, curRect.height, split });
-            tree->leftNode->parNode = tree;
-            Divide(_Map, tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-            return;
-        }
-    }
 
     if (n % 2 == 1)
     {
@@ -244,156 +228,108 @@ void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n
 
     //나올 수 있는 최대 길이와 최소 길이중에서 랜덤으로 한 값을 선택
 
-    
 
-    if (curRect.height >= curRect.width) //가로가 더 길었던 경우에는 좌 우로 나누게 될 것이며, 이 경우에는 세로 길이는 변하지 않는다.
-    {
-		//if (n > 2)
-        {
-			int trycnt = 0;
-            while (true)
-            {
-                trycnt++;
-                RectInt tmpleft = { curRect.x, curRect.y, split, curRect.width };
-                RectInt tmpright = { curRect.x + split + 1, curRect.y, curRect.height - split - 1, curRect.width };
-                if (max_room_size * leftnodecnt > GetRoomSize(tmpleft) && max_room_size * rightnodecnt > GetRoomSize(tmpright))
-                {
-                    printf("ERRRRRRRR");
-                    return;
-                }
-                if (trycnt > static_cast<int>(maxLength * max_rate))
-                {
-                    break;
-                }
-                else if (max_room_size * leftnodecnt > GetRoomSize(tmpleft))
-                {
-                    split++;
-                }
-                else if (max_room_size * rightnodecnt > GetRoomSize(tmpright))
-                {
-                    split--;
-                }
-                else
-                {
-                    break;
-                }
-            }
-        }
-
-        // 방의 최소 크기를 맞추기 위함이다.
-
-        tree->leftNode = new Node({ curRect.x, curRect.y, split, curRect.width });
-        //왼쪽 노드에 대한 정보다 
-        //위치는 좌측 하단 기준이므로 변하지 않으며, 가로 길이는 위에서 구한 랜덤값을 넣어준다.
-
-		tree->rightNode = new Node({ curRect.x + split + 1, curRect.y, curRect.height - split - 1, curRect.width });
-        //우측 노드에 대한 정보다 
-        //위치는 좌측 하단에서 오른쪽으로 가로 길이만큼 이동한 위치이며, 가로 길이는 기존 가로길이에서 새로 구한 가로값을 뺀 나머지 부분이 된다.
-
-		DrawLine(_Map, { curRect.x + split, curRect.y }, { curRect.x + split, curRect.y + curRect.width }, n);
-        //그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
-    }
-    else
-    {
-        //if (n > 2)
+	{
+		int trycnt = 0;
+		while (true)
 		{
-			int trycnt = 0;
-			while (true)
+			trycnt++;
+			if (trycnt > static_cast<int>(maxLength * max_rate))
 			{
-				trycnt++;
-				RectInt tmpleft = { curRect.x, curRect.y, curRect.height, split };
-				RectInt tmpright = { curRect.x, curRect.y + split + 1, curRect.height, curRect.width - split - 1 };
-				if (max_room_size * leftnodecnt > GetRoomSize(tmpleft) && max_room_size * rightnodecnt > GetRoomSize(tmpright))
-				{
-					printf("ERRRRRRRR");
-                    return;
-				}
-				if (trycnt > static_cast<int>(maxLength * max_rate))
-				{
-					break;
-				}
-				else if (max_room_size * leftnodecnt > GetRoomSize(tmpleft))
-				{
-					split++;
-				}
-				else if (max_room_size * rightnodecnt > GetRoomSize(tmpright))
-				{
-					split--;
-				}
-				else
-				{
-					break;
-				}
+				break;
+			}
+            GetChildRect(curRect, split, is_height, LeftRect, RightRect);
+            leftSize = GetRoomSize(LeftRect);
+            rightSize = GetRoomSize(RightRect);
+			if (max_room_size * leftnodecnt > leftSize && max_room_size * rightnodecnt > rightSize)
+			{
+				printf("ERRRRRRRR");
+				return;
+			}
+			else if (max_room_size * leftnodecnt > leftSize)
+			{
+				split++;
+			}
+			else if (max_room_size * rightnodecnt > rightSize)
+			{
+				split--;
+			}
+			else
+			{
+				break;
 			}
 		}
-        // 방의 최소 크기를 맞추기 위함이다.
-        tree->leftNode = new Node({ curRect.x, curRect.y, curRect.height, split });
-        tree->rightNode = new Node({ curRect.x, curRect.y + split+1, curRect.height, curRect.width - split-1 });
-		DrawLine(_Map, { curRect.x, curRect.y + split }, { curRect.x + curRect.height, curRect.y + split }, n);
-        //세로가 더 길었던 경우이다. 자세한 사항은 가로와 같다.
-    }
+	
+
+		// 방의 최소 크기를 맞추기 위함이다.
+
+		tree->leftNode = new Node(LeftRect);
+		//왼쪽 노드에 대한 정보다 
+		//위치는 좌측 하단 기준이므로 변하지 않으며, 가로 길이는 위에서 구한 랜덤값을 넣어준다.
+
+		tree->rightNode = new Node(RightRect);
+		//우측 노드에 대한 정보다 
+		//위치는 좌측 하단에서 오른쪽으로 가로 길이만큼 이동한 위치이며, 가로 길이는 기존 가로길이에서 새로 구한 가로값을 뺀 나머지 부분이 된다.
+
+		DrawLine(_Map, curRect, split, is_height, n);
+		//그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
+	}
+
     tree->leftNode->parNode = tree; //자식노드들의 부모노드를 나누기전 노드로 설정
     tree->rightNode->parNode = tree;
-    float nrate = _rate * 0.85f > 1.0 ? _rate * 0.85f : 1.0f;
+    float nrate = _rate * Rate > 1.0 ? _rate * Rate : 1.0f;
 	Divide(_Map, tree->leftNode, leftnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
 	Divide(_Map, tree->rightNode, rightnodecnt, _size, nrate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
 }
 
-
-// 벽 : 1, 땅 : 0, 문 : 2, 없는 지역 : -1 로 표기, (통로3??고민중)
-void GenerateRoom::DrawLine(std::vector<std::vector<int>>& _Map, Vector2 from, Vector2 to,int n) //from->to로 이어지는 선을 그리게 될 것이다.
+void GenerateRoom::DrawLine(std::vector<std::vector<int>>& _Map, const RectInt& _cur, int splite, bool is_height, int n)
 {
-    
-    if (from.x == to.x)
-    {
-        int starty = from.y > to.y ? to.y : from.y;
-        int endy = from.y < to.y ? to.y : from.y;
-        int diff = static_cast<int>((endy - starty) * 0.7f)/2/n;
-        int mid = (starty + endy) / 2;
+	if (is_height)
+	{
+        int mid = _cur.y + _cur.width / 2;
+        int diff = static_cast<int>(_cur.width * 0.35f / n);
 		int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
-        for (; starty < endy; ++starty)
-        {
-            if (0 == _Map[from.x][starty])
-            {
-                _Map[from.x][starty] = 1;
-            }
-        }
-        //Map[from.x][doorPos] = 2;
+		for (int i = _cur.y; i < _cur.y + _cur.width; ++i)
+		{
+			if (0 == _Map[_cur.x + splite][i])
+			{
+				_Map[_cur.x + splite][i] = 1;
+			}
+		}
 
         for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
         {
-            if (_Map[from.x][i] != -1)
+            if (_Map[_cur.x + splite][i] != -1)
             {
-                _Map[from.x][i] = 2;
+                _Map[_cur.x + splite][i] = 2;
             }
         }
-    }
-    else if (from.y == to.y)
-    {
-        int startx = from.x > to.x ? to.x : from.x;
-        int endx = from.x < to.x ? to.x : from.x;
-        int diff = static_cast<int>((endx - startx) * 0.7f)/2/n;
-        int mid = (startx + endx) / 2;
+
+	}
+	else
+	{
+        int mid = _cur.x + _cur.height / 2;
+        int diff = static_cast<int>(_cur.height * 0.35f / n);
         int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
-        for (; startx < endx; ++startx)
+		for (int i = _cur.x; i < _cur.x + _cur.height; ++i)
+		{
+			if (0 == _Map[i][_cur.y + splite])
+			{
+				_Map[i][_cur.y + splite] = 1;
+			}
+		}
+        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
         {
-            if (0 == _Map[startx][from.y])
+            if (_Map[i][_cur.y + splite] != -1)
             {
-                _Map[startx][from.y] = 1;
+                _Map[i][_cur.y + splite] = 2;
             }
         }
-
-        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size&1); ++i)
-        {
-            if (_Map[i][from.y] != -1)
-            {
-                _Map[i][from.y] = 2;
-            }
-        }
-    }
-
-
+	}
 }
+
+// 벽 : 1, 땅 : 0, 문 : 2, 없는 지역 : -1 로 표기, (통로3??고민중)
+
 
 void GenerateRoom::Print(const std::vector<std::vector<int>>& _Map)
 {
