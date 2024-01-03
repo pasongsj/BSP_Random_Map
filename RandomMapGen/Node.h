@@ -11,8 +11,8 @@ public:
 class RectInt
 {
 public:
-	RectInt(int _x, int _y, int _w, int _h)
-		:x(_x), y(_y), width(_w), height(_h)
+	RectInt(int _x, int _y, int _h, int _w)
+		:x(_x), y(_y), height(_h), width(_w)
 	{
 	}
 	RectInt()
@@ -21,8 +21,8 @@ public:
 	}
 	int x;
 	int y;
-	int width;
 	int height;
+	int width;
 };
 
 class Node
