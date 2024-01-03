@@ -8,10 +8,10 @@
 
 GenerateRoom* GenerateRoom::Room = nullptr;
 
-float GenerateRoom::min_rate = 0.9f;
-float GenerateRoom::max_rate = 1.1f;
+float GenerateRoom::min_rate = 0.8f;
+float GenerateRoom::max_rate = 1.2f;
 int GenerateRoom::door_size = 1;
-float GenerateRoom::Rate = 1.0f;
+float GenerateRoom::spare = 1.0f;
 
 
 std::vector<std::vector<bool>> GenerateRoom::isvisited;
@@ -21,7 +21,6 @@ std::vector<std::vector<int>>  GenerateRoom::TryMap;
 int GenerateRoom::lx = 0;
 int GenerateRoom::ly = 0;
 
-//std::vector<std::vector<int>> GenerateRoom::MapSizeIndex;
 
 
 GenerateRoom::GenerateRoom() 
@@ -33,23 +32,32 @@ GenerateRoom::~GenerateRoom()
 {
 }
 
-void GenerateRoom::Init(const std::vector<std::vector<int>>& _Map)
+void GenerateRoom::Init()
 {
     isvisited.resize(lx);
     MapSizeIndex.resize(lx);
-    TryMap.resize(lx);
     for (int i = 0; i < lx; ++i)
     {
         isvisited[i].resize(ly);
         MapSizeIndex[i].resize(ly);
-        TryMap[i].resize(ly);
         for (int j = 0; j < ly; ++j)
         {
             isvisited[i][j] = false;
             isvisited[i][j] = 0;
-            TryMap[i][j] = _Map[i][j];
         }
     }
+}
+void GenerateRoom::CpyMap(const std::vector<std::vector<int>>& _Map)
+{
+	TryMap.resize(lx);
+	for (int i = 0; i < lx; ++i)
+	{
+		TryMap[i].resize(ly);
+		for (int j = 0; j < ly; ++j)
+		{
+			TryMap[i][j] = _Map[i][j];
+		}
+	}
 }
 
 
@@ -121,7 +129,7 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>>& _Map, int roomcnt, i
     lx = static_cast<int>(_Map.size());
     ly = static_cast<int>(_Map[0].size());
 
-    Init(_Map);
+    Init();
 
     // 맵이 없는 부분(-1)확인,
     for (int i = 0; i < lx; ++i)
@@ -143,13 +151,37 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>>& _Map, int roomcnt, i
             isvisited[i][j] = true;
         }
     }
-
-    Rate = 0.83f;
     CalMapSizeIndex(_Map, MapSizeIndex);
+
     Node* RootNode = new Node({1, 1, lx -1, ly -1});
-    float _rate = static_cast<float>(GetRoomSize(RootNode->nodeRect)) / ((_size + 1) * 2 * roomcnt);
-    _rate = _rate * Rate < 1.0f ? 1.0f : _rate * Rate;
-	Divide(_Map, RootNode, roomcnt, _size, _rate);
+    spare = 0.8f;
+	float ratio = static_cast<float>(GetRoomSize(RootNode->nodeRect)) / ((_size + 1) * 2 * roomcnt);
+
+
+    while(true)
+    {
+        CpyMap(_Map);
+		float _rate = ratio * spare + 0.1f < 1.0f ? 1.0f : ratio * spare + 0.1f;
+        bool can_gen = Divide(RootNode, roomcnt, _size, _rate);
+        if (true == can_gen)
+        {
+            break;
+        }
+        spare += 0.01f;
+        if (spare >= 1.0f)
+        {
+            printf("err");
+            return;
+        }
+    }
+
+    for (int i = 0; i < lx; ++i)
+    {
+        for (int j = 0; j < ly; ++j)
+        {
+            _Map[i][j] = TryMap[i][j];
+        }
+    }
 }
 
 
@@ -169,15 +201,16 @@ void GenerateRoom::GetChildRect(const RectInt& _cur, int _split, bool is_height,
 }
 
 
-void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n, int _size, float _rate)
+bool GenerateRoom::Divide(Node* tree, int n, int _size, float _rate)
 {
     if (n == 1) 
     {
         if (_size > GetRoomSize(tree->nodeRect))
         {
-            printf("%d, %d ~ %d, %d ERRor\n", tree->nodeRect.x, tree->nodeRect.y , tree->nodeRect.height, tree->nodeRect.width);
+           // printf("%d, %d ~ %d, %d ERRor\n", tree->nodeRect.x, tree->nodeRect.y , tree->nodeRect.height, tree->nodeRect.width);
+            return false;
         }
-        return; // 더이상 방을 나눌 필요가 없을 때 return;
+        return true; // 더이상 방을 나눌 필요가 없을 때 return;
     }
     //그 외의 경우에는
 
@@ -203,15 +236,13 @@ void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n
     {
         tree->rightNode = new Node(RightRect);
         tree->rightNode->parNode = tree;
-        Divide(_Map, tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-        return;
+        return Divide(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
     else if (rightSize == 0)
     {
         tree->leftNode = new Node(LeftRect);
         tree->leftNode->parNode = tree;
-        Divide(_Map, tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-        return;
+        return Divide(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
 
 
@@ -243,8 +274,8 @@ void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n
             rightSize = GetRoomSize(RightRect);
 			if (max_room_size * leftnodecnt > leftSize && max_room_size * rightnodecnt > rightSize)
 			{
-				printf("ERRRRRRRR");
-				return;
+				//printf("ERRRRRRRR");
+				return false;
 			}
 			else if (max_room_size * leftnodecnt > leftSize)
 			{
@@ -271,18 +302,18 @@ void GenerateRoom::Divide(std::vector<std::vector<int>>& _Map, Node* tree, int n
 		//우측 노드에 대한 정보다 
 		//위치는 좌측 하단에서 오른쪽으로 가로 길이만큼 이동한 위치이며, 가로 길이는 기존 가로길이에서 새로 구한 가로값을 뺀 나머지 부분이 된다.
 
-		DrawLine(_Map, curRect, split, is_height, n);
+		DrawLine(curRect, split, is_height, n);
 		//그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
 	}
 
     tree->leftNode->parNode = tree; //자식노드들의 부모노드를 나누기전 노드로 설정
     tree->rightNode->parNode = tree;
-    float nrate = _rate * Rate > 1.0 ? _rate * Rate : 1.0f;
-	Divide(_Map, tree->leftNode, leftnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
-	Divide(_Map, tree->rightNode, rightnodecnt, _size, nrate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
+    return Divide(tree->leftNode, leftnodecnt, _size, nrate) && Divide(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+	//왼쪽, 오른쪽 자식 노드들도 나눠준다.
 }
 
-void GenerateRoom::DrawLine(std::vector<std::vector<int>>& _Map, const RectInt& _cur, int splite, bool is_height, int n)
+void GenerateRoom::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
 {
 	if (is_height)
 	{
@@ -291,17 +322,17 @@ void GenerateRoom::DrawLine(std::vector<std::vector<int>>& _Map, const RectInt& 
 		int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
 		for (int i = _cur.y; i < _cur.y + _cur.width; ++i)
 		{
-			if (0 == _Map[_cur.x + splite][i])
+			if (0 == TryMap[_cur.x + splite][i])
 			{
-				_Map[_cur.x + splite][i] = 1;
+                TryMap[_cur.x + splite][i] = 1;
 			}
 		}
 
         for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
         {
-            if (_Map[_cur.x + splite][i] != -1)
+            if (TryMap[_cur.x + splite][i] != -1)
             {
-                _Map[_cur.x + splite][i] = 2;
+                TryMap[_cur.x + splite][i] = 2;
             }
         }
 
@@ -313,16 +344,16 @@ void GenerateRoom::DrawLine(std::vector<std::vector<int>>& _Map, const RectInt& 
         int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
 		for (int i = _cur.x; i < _cur.x + _cur.height; ++i)
 		{
-			if (0 == _Map[i][_cur.y + splite])
+			if (0 == TryMap[i][_cur.y + splite])
 			{
-				_Map[i][_cur.y + splite] = 1;
+                TryMap[i][_cur.y + splite] = 1;
 			}
 		}
         for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
         {
-            if (_Map[i][_cur.y + splite] != -1)
+            if (TryMap[i][_cur.y + splite] != -1)
             {
-                _Map[i][_cur.y + splite] = 2;
+                TryMap[i][_cur.y + splite] = 2;
             }
         }
 	}
