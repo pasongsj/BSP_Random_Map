@@ -5,7 +5,6 @@
 // 설명 :
 class GenerateRoom
 {
-	static GenerateRoom* Room;
 public:
 	// constrcuter destructer
 	GenerateRoom();
@@ -38,10 +37,10 @@ private:
 	static bool In_range(int x, int y);
 
 	// 현재 Node를 n개로 나누고싶다는 의미
-	static bool Divide(Node* tree,int n, int _size, float _rate);
+	static bool Divide(std::shared_ptr<Node> tree, int n, int _size, float _rate);
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-	static void DrawLine(const RectInt& _cur, int splite, bool is_height, int n); 
+	static void DrawLine(const RectInt& _cur, int splite, bool is_height, int n);
 
 	// 해당 인덱스까지 모든 넓이의 합을 dp로 구함
 	static void CalMapSizeIndex(const std::vector<std::vector<int>>& Map, std::vector<std::vector<int>>& MapIndex);
@@ -54,12 +53,12 @@ private:
 
 	// 현재 Map사이즈로 사전작업을 하기위한 initialize
 	static void Init();
-	
+
 	// 테스트용 맵에 cpy하는 과정
 	static void CpyMap(const std::vector<std::vector<int>>& _Map);
 
 	// generate완료 후 노드를 삭제하기 위함
-	static void ReleaseNode(Node* _cNode);
+	static void ReleaseNode(std::shared_ptr<Node> _cNode);
 
 
 
@@ -74,6 +73,6 @@ private:
 	static int door_size;		// 두 자식노드 사이를 연결하는 문의 길이
 	static float spare;			// 노드를 자를 때 최소 여분 영역 제공 비율
 
-	static Node* RootNode;		// 루트 노드
+	static std::shared_ptr<Node> RootNode;		// 루트 노드
 };
 

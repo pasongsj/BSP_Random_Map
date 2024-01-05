@@ -6,12 +6,11 @@
 #include <tuple>
 
 
-GenerateRoom* GenerateRoom::Room = nullptr;
 
 float GenerateRoom::m_rate = 0.2f;
 int GenerateRoom::door_size = 1;
 float GenerateRoom::spare = 1.0f;
-Node* GenerateRoom::RootNode = nullptr;
+std::shared_ptr<class Node> GenerateRoom::RootNode = nullptr;
 
 
 std::vector<std::vector<bool>> GenerateRoom::isvisited;
@@ -25,14 +24,14 @@ int GenerateRoom::ly = 0;
 
 GenerateRoom::GenerateRoom() 
 {
-    Room = this;
+    //Room = this;
 }
 
 GenerateRoom::~GenerateRoom() 
 {
 }
 
-void GenerateRoom::ReleaseNode(Node* _cNode)
+void GenerateRoom::ReleaseNode(std::shared_ptr<Node> _cNode)
 {
     if (nullptr == _cNode)
     {
@@ -48,7 +47,11 @@ void GenerateRoom::ReleaseNode(Node* _cNode)
         ReleaseNode(_cNode->rightNode);
         _cNode->rightNode = nullptr;
     }
-    delete _cNode;
+    if (_cNode->parNode != nullptr)
+    {
+        _cNode->parNode = nullptr;
+    }
+    //delete _cNode;
 }
 
 
@@ -193,7 +196,9 @@ void GenerateRoom::CreateMap(std::vector<std::vector<int>>& _Map, int roomcnt, i
         // 맵 생성
         if (nullptr == RootNode)
         {
-            RootNode = new Node({ 1, 1, lx - 1, ly - 1 }); // 맵의 테두리를 제외한 크기의 루트노드
+            RootNode = std::make_shared<Node>();
+            RootNode->nodeRect = { 1, 1, lx - 1, ly - 1 };
+            //RootNode = new Node({ 1, 1, lx - 1, ly - 1 }); // 맵의 테두리를 제외한 크기의 루트노드
         }
         bool can_gen = Divide(RootNode, roomcnt, _size, _rate);
 
@@ -240,7 +245,7 @@ void GenerateRoom::GetChildRect(const RectInt& _cur, int _split, bool is_height,
 }
 
 
-bool GenerateRoom::Divide(Node* tree, int n, int _size, float _rate)
+bool GenerateRoom::Divide(std::shared_ptr<Node> tree, int n, int _size, float _rate)
 {
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
@@ -283,13 +288,15 @@ bool GenerateRoom::Divide(Node* tree, int n, int _size, float _rate)
     // 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
     if (leftSize == 0)
     {
-        tree->rightNode = new Node(RightRect);
+        tree->rightNode = std::make_shared<Node>();
+        tree->rightNode->nodeRect = RightRect;
         tree->rightNode->parNode = tree;
         return Divide(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
     else if (rightSize == 0)
     {
-        tree->leftNode = new Node(LeftRect);
+        tree->leftNode = std::make_shared<Node>();
+        tree->leftNode->nodeRect = LeftRect;
         tree->leftNode->parNode = tree;
         return Divide(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
@@ -305,6 +312,12 @@ bool GenerateRoom::Divide(Node* tree, int n, int _size, float _rate)
     {
         int tmp = (maxLength * leftSize) / (leftSize + rightSize);
 		split = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (tmp));
+    }
+
+    // split 위치가 사각형을 벗어난 경우
+	if (split < 0 || split > maxLength)
+    {
+        return false;
     }
 
     // 나올 수 있는 최대 길이와 최소 길이중에서 랜덤으로 한 값을 선택
@@ -343,10 +356,12 @@ bool GenerateRoom::Divide(Node* tree, int n, int _size, float _rate)
 		// 방의 최소 크기를 맞추기 위함이다.
 
 		//왼쪽 노드에 대한 정보다 
-		tree->leftNode = new Node(LeftRect);
+        tree->leftNode = std::make_shared<Node>();
+        tree->leftNode->nodeRect = LeftRect;
 
 		//우측 노드에 대한 정보다 
-		tree->rightNode = new Node(RightRect);
+        tree->rightNode = std::make_shared<Node>();
+        tree->rightNode->nodeRect = RightRect;
 
 		//그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
 		DrawLine(curRect, split, is_height, n);
@@ -407,7 +422,7 @@ void GenerateRoom::DrawLine(const RectInt& _cur, int splite, bool is_height, int
 	}
 }
 
-// 벽 : 1, 땅 : 0, 문 : 2, 없는 지역 : -1 로 표기, (통로3??고민중)
+// 벽 : 1, 땅 : 0, 문 : 2, 없는 지역 : -1 로 표기
 void GenerateRoom::Print(const std::vector<std::vector<int>>& _Map)
 {
     for (int i = 0; i < 60; ++i)

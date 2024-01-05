@@ -1,8 +1,15 @@
 #include <RandomMapGen/GenerateRoom.h>
 #include <vector>
+#include <crtdbg.h>
+
+
 
 int main()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+	//int* a = new int();
+
 	std::vector<std::vector<int>> Map;
 	Map.resize(60);
 	for (int i = 0; i < 60; ++i)
