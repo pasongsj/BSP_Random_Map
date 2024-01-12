@@ -11,38 +11,49 @@ int main()
 	//int* a = new int();
 
 	std::vector<std::vector<int>> Map;
-	Map.resize(60);
-	for (int i = 0; i < 60; ++i)
+	Map.resize(40);
+	for (int i = 0; i < 40; ++i)
 	{
-		Map[i].resize(50);
+		Map[i].resize(40);
 	}
 
-	for (int i = 0; i < 30; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
-		for (int j = 0; j < 25; ++j)
+		for (int j = 0; j < 10; ++j)
 		{
 			Map[i][j] = -1;
-			//Map[59 - i][49 - j] = -1;
 		}
 	}
 
-	for (int i = 40; i < 60; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
-		for (int j = 25; j < 50; ++j)
+		for (int j = 30; j < 40; ++j)
 		{
 			Map[i][j] = -1;
-			//Map[59 - i][49 - j] = -1;
 		}
 	}
-	//Map[3][5] = -1;
-	//Map[3][4] = -1;
-	//Map[3][3] = -1;
-	//Map[34][23] = -1;
-	//Map[33][22] = -1;
-	//Map[56][2] = -1;
-	//Map[8][2] = -1;
-	GenerateRoom::CreateMap(Map, 40,10);
-	GenerateRoom::Print(Map);
+
+	for (int i = 30; i < 40; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			Map[i][j] = -1;
+		}
+	}
+
+	for (int i = 30; i < 40; ++i)
+	{
+		for (int j = 30; j < 40; ++j)
+		{
+			Map[i][j] = -1;
+		}
+	}
+
+
+	if (true == GenerateRoom::CreateMap(Map, 20, 5, MapType::RoomType))
+	{
+		GenerateRoom::Print(Map);
+	}
 
 	
 
