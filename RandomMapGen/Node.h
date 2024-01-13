@@ -64,6 +64,10 @@ public:
 		{
 			return leftNode->MinNode();
 		}
+		if (nullptr != rightNode)
+		{
+			return rightNode->MaxNode();
+		}
 		return shared_from_this();
 	}
 
@@ -73,6 +77,10 @@ public:
 		if (nullptr != rightNode)
 		{
 			return rightNode->MaxNode();
+		}
+		if (nullptr != leftNode)
+		{
+			return leftNode->MaxNode();
 		}
 		return shared_from_this();
 	}
