@@ -56,7 +56,7 @@ int main()
 		newMap->Print(Map);
 	}
 
-	
+	delete newMap;
 
 	return 0;
 }
