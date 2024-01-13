@@ -7,19 +7,19 @@
 
 
 
-float GenerateRoom::m_rate = 0.2f;
-int GenerateRoom::door_size = 1;
-float GenerateRoom::spare = 1.0f;
-std::shared_ptr<class Node> GenerateRoom::RootNode = nullptr;
-
-
-std::vector<std::vector<bool>> GenerateRoom::isvisited;
-std::vector<std::vector<int>>  GenerateRoom::MapSizeIndex;
-std::vector<std::vector<int>>  GenerateRoom::TryMap;
-std::vector<std::shared_ptr<Node>> GenerateRoom::LeafNodeList;
-
-int GenerateRoom::lx = 0;
-int GenerateRoom::ly = 0;
+//float GenerateRoom::m_rate = 0.2f;
+//int GenerateRoom::door_size = 1;
+//float GenerateRoom::spare = 1.0f;
+//std::shared_ptr<class Node> GenerateRoom::RootNode = nullptr;
+//
+//
+//std::vector<std::vector<bool>> GenerateRoom::isvisited;
+//std::vector<std::vector<int>>  GenerateRoom::MapSizeIndex;
+//std::vector<std::vector<int>>  GenerateRoom::TryMap;
+//std::vector<std::shared_ptr<Node>> GenerateRoom::LeafNodeList;
+//
+//int GenerateRoom::lx = 0;
+//int GenerateRoom::ly = 0;
 
 
 

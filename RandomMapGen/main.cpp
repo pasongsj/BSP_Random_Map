@@ -17,42 +17,43 @@ int main()
 		Map[i].resize(40);
 	}
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
-		for (int j = 0; j < 10; ++j)
+		for (int j = 0; j < 15; ++j)
 		{
 			Map[i][j] = -1;
 		}
 	}
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 15; ++i)
 	{
-		for (int j = 30; j < 40; ++j)
+		for (int j = 25; j < 40; ++j)
 		{
 			Map[i][j] = -1;
 		}
 	}
 
-	for (int i = 30; i < 40; ++i)
+	for (int i = 25; i < 40; ++i)
 	{
-		for (int j = 0; j < 10; ++j)
+		for (int j = 0; j < 15; ++j)
 		{
 			Map[i][j] = -1;
 		}
 	}
 
-	for (int i = 30; i < 40; ++i)
+	for (int i = 25; i < 40; ++i)
 	{
-		for (int j = 30; j < 40; ++j)
+		for (int j = 25; j < 40; ++j)
 		{
 			Map[i][j] = -1;
 		}
 	}
 
+	GenerateRoom* newMap = new GenerateRoom();
 
-	if (true == GenerateRoom::CreateMap(Map, 20, 5, MapType::RoomType))
+	if (true == newMap->CreateMap(Map, 20, 5, MapType::RoomType))
 	{
-		GenerateRoom::Print(Map);
+		newMap->Print(Map);
 	}
 
 	
