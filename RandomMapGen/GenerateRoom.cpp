@@ -90,6 +90,7 @@ bool GenerateRoom::In_range(int x, int y)
 {
     return 0 < x && x < lx-1 && 0 < y && y < ly-1;
 }
+
 int GenerateRoom::GetRoomSize(const RectInt Rectinfo)
 {
     return MapSizeIndex[Rectinfo.x + Rectinfo.height - 1][Rectinfo.y + Rectinfo.width - 1] - MapSizeIndex[Rectinfo.x - 1][Rectinfo.y + Rectinfo.width - 1]

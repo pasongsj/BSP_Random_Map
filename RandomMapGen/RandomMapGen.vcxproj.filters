@@ -4,11 +4,15 @@
     <ClInclude Include="Node.h" />
     <ClInclude Include="GenerateRoom.h" />
     <ClInclude Include="GameEngineRandom.h" />
+    <ClInclude Include="URectMapGenerator.h" />
+    <ClInclude Include="URectWallMapGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="GenerateRoom.cpp" />
     <ClCompile Include="GameEngineRandom.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="URectMapGenerator.cpp" />
+    <ClCompile Include="URectWallMapGenerator.cpp" />
   </ItemGroup>
 </Project>

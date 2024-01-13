@@ -91,9 +91,9 @@ private:
 	int lx;		// 맵의 세로길이
 	int ly;		// 맵의 가로길이
 
-	float m_rate;		// 노드를 자르는 랜덤비율의 범위 1 - m_rate ~ 1 + m_rate
-	int door_size;		// 두 자식노드 사이를 연결하는 문의 길이
-	float spare;			// 노드를 자를 때 최소 여분 영역 제공 비율
+	float m_rate = 0.2f;		// 노드를 자르는 랜덤비율의 범위 1 - m_rate ~ 1 + m_rate
+	int door_size = 1;		// 두 자식노드 사이를 연결하는 문의 길이
+	float spare = 0.8f;			// 노드를 자를 때 최소 여분 영역 제공 비율
 
 	std::shared_ptr<Node> RootNode;		// 루트 노드
 	std::vector<std::shared_ptr<Node>> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)

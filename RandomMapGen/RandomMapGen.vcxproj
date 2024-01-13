@@ -28,6 +28,14 @@
       <SubType>
       </SubType>
     </ClInclude>
+    <ClInclude Include="URectMapGenerator.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
+    <ClInclude Include="URectWallMapGenerator.h">
+      <SubType>
+      </SubType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameEngineRandom.cpp" />
@@ -37,6 +45,14 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="URectMapGenerator.cpp">
+      <SubType>
+      </SubType>
+    </ClCompile>
+    <ClCompile Include="URectWallMapGenerator.cpp">
       <SubType>
       </SubType>
     </ClCompile>

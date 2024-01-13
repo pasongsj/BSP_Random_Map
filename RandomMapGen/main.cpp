@@ -2,7 +2,7 @@
 #include <vector>
 #include <crtdbg.h>
 
-
+#include "URectWallMapGenerator.h"
 
 int main()
 {
@@ -49,14 +49,22 @@ int main()
 		}
 	}
 
-	GenerateRoom* newMap = new GenerateRoom();
+	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
-	if (true == newMap->CreateMap(Map, 20, 5, MapType::RoomType))
+	URectMapGenerator* NewMap = new URectWallMapGenerator(Map, 20, 5, 1);
+	if (true == NewMap->CreateMap())
 	{
-		newMap->Print(Map);
+		NewMap->Print();
 	}
+	delete NewMap;
+	//GenerateRoom* newMap = new GenerateRoom();
 
-	delete newMap;
+	//if (true == newMap->CreateMap(Map, 20, 5, MapType::RoomType))
+	//{
+	//	newMap->Print(Map);
+	//}
+
+	//delete newMap;
 
 	return 0;
 }
