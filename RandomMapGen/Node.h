@@ -22,7 +22,7 @@ public:
 class Node : public std::enable_shared_from_this<Node>
 {
 public:
-	std::shared_ptr<Node> parNode;			// 부모노드
+	std::weak_ptr<Node> parNode;			// 부모노드
 	std::shared_ptr<Node> leftNode;			// 왼쪽 자식 노드
 	std::shared_ptr<Node> rightNode;		// 오른쪽 자식 노드
 	RectInt nodeRect;		// 공간 정보
@@ -31,7 +31,7 @@ public:
 	Node(RectInt rect)
 	{
 		nodeRect = rect;
-		parNode = nullptr;
+		parNode;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
@@ -39,14 +39,14 @@ public:
 	Node()
 	{
 		nodeRect = { 0,0,0,0 };
-		parNode = nullptr;
+		parNode;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
 
 	~Node()
 	{
-		parNode = nullptr;
+		parNode;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
@@ -88,19 +88,19 @@ public:
 	// 이전 리프노드
 	std::shared_ptr<Node> GetBeforeNode()
 	{
-		if (nullptr == parNode)
+		if (!parNode.expired())
 		{
 			return nullptr;
 		}
 
 		// 오른쪽 노드면서
-		if (parNode->rightNode == shared_from_this())
+		if (parNode.lock()->rightNode == shared_from_this())
 		{
-			if(nullptr != parNode->leftNode) // 왼쪽노드가 존재한다면
+			if(nullptr != parNode.lock()->leftNode) // 왼쪽노드가 존재한다면
 			{
-				return parNode->leftNode->MaxNode(); // 왼쪽노드의 max값
+				return parNode.lock()->leftNode->MaxNode(); // 왼쪽노드의 max값
 			}
-			return parNode->GetBeforeNode();
+			return parNode.lock()->GetBeforeNode();
 		}
 		else // 왼쪽 노드라면
 		{
@@ -120,14 +120,14 @@ public:
 	// 이전 리프노드
 	std::shared_ptr<Node> GetParentNode_RIghtChild()
 	{
-		if (nullptr == parNode)
+		if (!parNode.expired())
 		{
 			return nullptr;
 		}
-		if (parNode->leftNode == shared_from_this())
+		if (parNode.lock()->leftNode == shared_from_this())
 		{
-			return parNode->GetParentNode_RIghtChild();
+			return parNode.lock()->GetParentNode_RIghtChild();
 		}
-		return parNode;
+		return parNode.lock();
 	}
 };

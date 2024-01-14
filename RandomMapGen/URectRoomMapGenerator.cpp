@@ -1,18 +1,18 @@
-#include "URectWallMapGenerator.h"
+#include "URectRoomMapGenerator.h"
 
-
-URectWallMapGenerator::URectWallMapGenerator() 
+URectRoomMapGenerator::URectRoomMapGenerator() 
 {
 }
 
-URectWallMapGenerator::~URectWallMapGenerator() 
+URectRoomMapGenerator::~URectRoomMapGenerator() 
 {
 }
 
 
-bool URectWallMapGenerator::CreateMap()
+
+bool URectRoomMapGenerator::CreateMap()
 {
-	URectMapGenerator::CreateMap();
+    URectMapGenerator::CreateMap();
 
 
     float ratio = static_cast<float>(GetRoomSize({ 1, 1, lx - 1, ly - 1 })) / ((min_room_size + 1) * 2 * room_cnt);
@@ -51,8 +51,6 @@ bool URectWallMapGenerator::CreateMap()
             }
         }
     }
-
-
     for (int i = 0; i < lx; ++i) // 랜덤맵 생성을 성공한 경우 cpy
     {
         for (int j = 0; j < ly; ++j)
@@ -95,7 +93,7 @@ bool URectWallMapGenerator::CreateMap()
 }
 
 // 현재 Node를 n개로 나누고싶다는 의미
-bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate)
+bool URectRoomMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate)
 {
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
@@ -229,7 +227,7 @@ bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
 }
 
 //자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
+void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
 {
     if (is_height)
     {
@@ -243,16 +241,6 @@ void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
                 try_map_gen[_cur.x + splite][i] = 1;
             }
         }
-
-		for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
-		{
-			if (try_map_gen[_cur.x + splite][i] != -1)
-			{
-				try_map_gen[_cur.x + splite][i] = 2;
-			}
-		}
-        
-
     }
     else
     {
@@ -266,14 +254,5 @@ void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
                 try_map_gen[i][_cur.y + splite] = 1;
             }
         }
-
-		for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
-		{
-			if (try_map_gen[i][_cur.y + splite] != -1)
-			{
-				try_map_gen[i][_cur.y + splite] = 2;
-			}
-		}
-
     }
 }

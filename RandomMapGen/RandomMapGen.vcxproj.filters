@@ -6,6 +6,7 @@
     <ClInclude Include="GameEngineRandom.h" />
     <ClInclude Include="URectMapGenerator.h" />
     <ClInclude Include="URectWallMapGenerator.h" />
+    <ClInclude Include="URectRoomMapGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Node.cpp" />
@@ -14,5 +15,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="URectMapGenerator.cpp" />
     <ClCompile Include="URectWallMapGenerator.cpp" />
+    <ClCompile Include="URectRoomMapGenerator.cpp" />
   </ItemGroup>
 </Project>

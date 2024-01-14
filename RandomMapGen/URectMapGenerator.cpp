@@ -93,24 +93,7 @@ void URectMapGenerator::CpyMap()
 void URectMapGenerator::ReleaseNode(std::shared_ptr<Node> _cNode)
 {
     LeafNodeList.clear();
-    if (nullptr == _cNode)
-    {
-        return;
-    }
-    if (_cNode->leftNode != nullptr)
-    {
-        ReleaseNode(_cNode->leftNode);
-        _cNode->leftNode = nullptr;
-    }
-    if (_cNode->rightNode != nullptr)
-    {
-        ReleaseNode(_cNode->rightNode);
-        _cNode->rightNode = nullptr;
-    }
-    if (_cNode->parNode != nullptr)
-    {
-        _cNode->parNode = nullptr;
-    }
+    RootNode = nullptr;
 }
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Node.h"
+#include "GameEngineRandom.h"
 
 // Ό³Έν :
 class URectMapGenerator
@@ -8,7 +9,6 @@ class URectMapGenerator
 public:
 	// constrcuter destructer
 	URectMapGenerator();
-
 
 	URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 	{
