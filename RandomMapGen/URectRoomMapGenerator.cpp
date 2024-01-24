@@ -59,6 +59,11 @@ bool URectRoomMapGenerator::CreateMap()
         }
     }
 
+    for (std::shared_ptr<Node> _leaf : LeafNodeList)
+    {
+        CreateRoom(_leaf);
+    }
+
     // -- test --
     // 
     //std::shared_ptr<Node> curNode = RootNode->MaxNode();
@@ -226,6 +231,23 @@ bool URectRoomMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
 
 }
 
+
+bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+{
+    base_map = _map;
+
+    lx = static_cast<int>(_map.size());
+    ly = static_cast<int>(_map[0].size());
+
+    room_cnt = _roomcnt;
+    min_room_size = _min_room_size;
+    door_size = _doorsize;
+
+    spare = 0.8f;
+
+    return URectRoomMapGenerator::CreateMap();
+}
+
 //자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
 void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
 {
@@ -254,5 +276,47 @@ void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
                 try_map_gen[i][_cur.y + splite] = 1;
             }
         }
+    }
+}
+
+void URectRoomMapGenerator::CreateRoom(std::shared_ptr<Node> _leafNode)
+{
+    RectInt CurRect = _leafNode->nodeRect;
+     // 삼각형
+    if (CurRect.width >= 5 && CurRect.height >= 5)
+    {
+        int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width-2);
+        int b_x = CurRect.x;
+        int b_y = CurRect.y + point_len;
+
+
+        int a_x = CurRect.x + CurRect.height-2;
+        int a_y = CurRect.y;
+
+        int c_x = CurRect.x + CurRect.height-2;
+        int c_y = CurRect.y + CurRect.width-2;
+
+        if (base_map[b_x][b_y] != 0 || base_map[a_x][a_y] != 0 || base_map[c_x][c_y] != 0)
+        {
+            return;
+        }
+
+        for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+        {
+            for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+            {
+                if ((i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+                {
+                    if (base_map[i][j] == 0)
+                    {
+                        base_map[i][j] = 1;
+                    }
+                }
+            }
+        }
+		//(b_y - a_y)* i > (b_x - a_x)* j + b_x
+		//(c_y - b_y)* i > (c_x - b_x)* j + b_x
+
+
     }
 }

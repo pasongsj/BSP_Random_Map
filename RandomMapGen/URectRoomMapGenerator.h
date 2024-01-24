@@ -32,6 +32,8 @@ public:
 	URectRoomMapGenerator& operator=(URectRoomMapGenerator&& _Other) noexcept = delete;
 
 	bool CreateMap() override;
+	bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
+
 
 protected:
 
@@ -42,6 +44,8 @@ protected:
 	void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) override;
 
 private:
+
+	void CreateRoom(std::shared_ptr<Node> _leafNode);
 
 };
 

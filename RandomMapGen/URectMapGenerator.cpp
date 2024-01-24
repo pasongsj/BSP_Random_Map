@@ -163,3 +163,20 @@ bool URectMapGenerator::CreateMap()
 
     return true;
 }
+
+bool URectMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+{
+    base_map = _map;
+
+    lx = static_cast<int>(_map.size());
+    ly = static_cast<int>(_map[0].size());
+
+    room_cnt = _roomcnt;
+    min_room_size = _min_room_size;
+    door_size = _doorsize;
+
+    spare = 0.8f;
+
+
+    return CreateMap();
+}

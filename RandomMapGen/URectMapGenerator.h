@@ -38,6 +38,7 @@ public:
 
 	void Print();
 	virtual bool CreateMap();
+	virtual bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize);
 
 protected:
 

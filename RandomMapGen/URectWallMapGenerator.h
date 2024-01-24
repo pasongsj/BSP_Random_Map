@@ -33,6 +33,9 @@ public:
 	URectWallMapGenerator& operator=(URectWallMapGenerator&& _Other) noexcept = delete;
 
 	bool CreateMap() override;
+
+	bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
+
 protected:
 
 	// 현재 Node를 n개로 나누고싶다는 의미

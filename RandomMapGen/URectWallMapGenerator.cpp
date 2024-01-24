@@ -94,6 +94,23 @@ bool URectWallMapGenerator::CreateMap()
 
 }
 
+
+bool URectWallMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+{
+    base_map = _map;
+
+    lx = static_cast<int>(_map.size());
+    ly = static_cast<int>(_map[0].size());
+
+    room_cnt = _roomcnt;
+    min_room_size = _min_room_size;
+    door_size = _doorsize;
+
+    spare = 0.8f;
+    return URectWallMapGenerator::CreateMap();
+}
+
+
 // 현재 Node를 n개로 나누고싶다는 의미
 bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate)
 {
