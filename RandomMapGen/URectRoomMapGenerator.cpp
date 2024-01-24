@@ -64,30 +64,6 @@ bool URectRoomMapGenerator::CreateMap()
         CreateRoom(_leaf);
     }
 
-    // -- test --
-    // 
-    //std::shared_ptr<Node> curNode = RootNode->MaxNode();
-    //int cnt = 1;
-    //while (nullptr != curNode)
-    //{
-    //    std::cout << cnt++<<' ';
-    //    curNode->PrintNode();
-    //    curNode = curNode->GetBeforeNode();
-    //}
-
-    //std::cout << '\n'<<'\n';
-    //
-    //cnt = 1;
-    //for (const std::shared_ptr<Node>& CurNode : LeafNodeList)
-    //{
-    //    std::cout << cnt++ << ' ';
-    //    CurNode->PrintNode();
-    //}
-    //std::cout << '\n';
-
-
-    // -- test --
-
 
     // 노드 release
     ReleaseNode(RootNode);
@@ -282,41 +258,224 @@ void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
 void URectRoomMapGenerator::CreateRoom(std::shared_ptr<Node> _leafNode)
 {
     RectInt CurRect = _leafNode->nodeRect;
-     // 삼각형
-    if (CurRect.width >= 5 && CurRect.height >= 5)
+    if (CurRect.width < 5 || CurRect.height < 5)
     {
-        int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width-2);
-        int b_x = CurRect.x;
-        int b_y = CurRect.y + point_len;
+        return;
+    }
 
 
-        int a_x = CurRect.x + CurRect.height-2;
-        int a_y = CurRect.y;
+    int random_polygon = GameEngineRandom::MainRandom.RandomInt(0, 4);
 
-        int c_x = CurRect.x + CurRect.height-2;
-        int c_y = CurRect.y + CurRect.width-2;
+    switch (random_polygon)
+    {
+    case 0:
+    {
+		// 삼각형
+		if (CurRect.width >= 5 && CurRect.height >= 5)
+		{
+			int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width - 2);
+			int b_x = CurRect.x;
+			int b_y = CurRect.y + point_len;
 
-        if (base_map[b_x][b_y] != 0 || base_map[a_x][a_y] != 0 || base_map[c_x][c_y] != 0)
+
+			int a_x = CurRect.x + CurRect.height - 2;
+			int a_y = CurRect.y;
+
+			int c_x = CurRect.x + CurRect.height - 2;
+			int c_y = CurRect.y + CurRect.width - 2;
+
+			if (base_map[b_x][b_y] != 0 || base_map[a_x][a_y] != 0 || base_map[c_x][c_y] != 0)
+			{
+				return;
+			}
+
+			for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+			{
+				for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+				{
+					if ((i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+					{
+						if (base_map[i][j] == 0)
+						{
+							base_map[i][j] = 1;
+						}
+					}
+				}
+			}
+		}
+        break;
+    }
+    case 1:
+    case 2:
+    case 3:
+    {
+
+        // 사각형
+        if (CurRect.width >= 5 && CurRect.height >= 5)
         {
-            return;
-        }
 
-        for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
-        {
-            for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x, CurRect.x + CurRect.height / 4);
+            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y, CurRect.y + CurRect.width / 4);
+            int len_x = GameEngineRandom::MainRandom.RandomInt(CurRect.height / 2, CurRect.x + CurRect.height- start_x); 
+            int len_y = GameEngineRandom::MainRandom.RandomInt(CurRect.width / 2, CurRect.y + CurRect.width - start_y);
+
+
+            for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
             {
-                if ((i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+                for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
                 {
-                    if (base_map[i][j] == 0)
+                    if (i < start_x || start_x >= start_x + len_x || j < start_y || j >= start_y + len_y)
                     {
-                        base_map[i][j] = 1;
+                        if (base_map[i][j] == 0)
+                        {
+                            base_map[i][j] = 1;
+                        }
                     }
                 }
             }
         }
-		//(b_y - a_y)* i > (b_x - a_x)* j + b_x
-		//(c_y - b_y)* i > (c_x - b_x)* j + b_x
-
+        break;
 
     }
+    case 4:
+    {
+        // 마름모
+        if (CurRect.width >= 3 && CurRect.height >= 3)
+        {
+            int point_x = (CurRect.height) / 2 - 1;
+            int point_y = (CurRect.width) / 2 - 1;
+
+            int a_x = CurRect.x + point_x;
+            int a_y = CurRect.y;
+
+            int b_x = CurRect.x;
+            int b_y = CurRect.y + point_y;
+
+
+            int c_x = CurRect.x + point_x;
+            int c_y = CurRect.y + point_y * 2;
+
+
+            int d_x = CurRect.x + point_x * 2;
+            int d_y = CurRect.y + point_y;
+
+            for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+            {
+                for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+                {
+                    if (
+                        (i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))) ||
+                        (i * (d_y - a_y) > ((d_x - a_x) * (j - d_y) + d_x * (d_y - a_y))) || (i * (d_y - c_y) < ((d_x - c_x) * (j - d_y) + d_x * (d_y - c_y)))
+                        )
+                    {
+                        if (base_map[i][j] == 0)
+                        {
+                            base_map[i][j] = 1;
+                        }
+                    }
+                }
+            }
+        }
+        break;
+
+    }
+    default:
+        break;
+    }
+    // // 삼각형
+    //if (CurRect.width >= 5 && CurRect.height >= 5)
+    //{
+    //    int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width-2);
+    //    int b_x = CurRect.x;
+    //    int b_y = CurRect.y + point_len;
+
+
+    //    int a_x = CurRect.x + CurRect.height-2;
+    //    int a_y = CurRect.y;
+
+    //    int c_x = CurRect.x + CurRect.height-2;
+    //    int c_y = CurRect.y + CurRect.width-2;
+
+    //    if (base_map[b_x][b_y] != 0 || base_map[a_x][a_y] != 0 || base_map[c_x][c_y] != 0)
+    //    {
+    //        return;
+    //    }
+
+    //    for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+    //    {
+    //        for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+    //        {
+    //            if ((i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+    //            {
+    //                if (base_map[i][j] == 0)
+    //                {
+    //                    base_map[i][j] = 1;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
+    //// 사각형
+    //if (CurRect.width >= 5 && CurRect.height >= 5)
+    //{
+
+    //    int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x, CurRect.x + CurRect.height / 4);
+    //    int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y, CurRect.y + CurRect.width / 4);
+    //    int len_x = GameEngineRandom::MainRandom.RandomInt(CurRect.height / 2, CurRect.x + CurRect.height- start_x); 
+    //    int len_y = GameEngineRandom::MainRandom.RandomInt(CurRect.width / 2, CurRect.y + CurRect.width - start_y);
+
+
+    //    for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+    //    {
+    //        for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+    //        {
+    //            if (i < start_x || start_x >= start_x + len_x || j < start_y || j >= start_y + len_y)
+    //            {
+    //                if (base_map[i][j] == 0)
+    //                {
+    //                    base_map[i][j] = 1;
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+
+    //// 마름모
+    //if (CurRect.width >= 3 && CurRect.height >= 3)
+    //{
+	//	int point_x = (CurRect.height) / 2 - 1;
+	//	int point_y = (CurRect.width) / 2 - 1;
+    //
+    //    int a_x = CurRect.x + point_x;
+    //    int a_y = CurRect.y;
+    //
+    //    int b_x = CurRect.x ;
+    //    int b_y = CurRect.y + point_y;
+    //
+    //
+    //    int c_x = CurRect.x + point_x;
+	//	int c_y = CurRect.y + point_y * 2;
+    //
+    //
+	//	int d_x = CurRect.x + point_x * 2;
+    //    int d_y = CurRect.y + point_y;
+    //
+    //    for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+	//	{
+	//		for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+	//		{
+	//			if (
+    //                (i * (b_y - a_y) < ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) || (i * (b_y - c_y) > ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))) ||
+    //                (i * (d_y - a_y) > ((d_x - a_x) * (j - d_y) + d_x * (d_y - a_y))) || (i * (d_y - c_y) < ((d_x - c_x) * (j - d_y) + d_x * (d_y - c_y))) 
+    //                )
+	//			{
+	//				if (base_map[i][j] == 0)
+	//				{
+	//					base_map[i][j] = 1;
+	//				}
+	//			}
+	//		}
+	//	}
+    //}
 }
