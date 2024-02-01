@@ -13,10 +13,25 @@ public:
 		:x(0), y(0), width(0), height(0)
 	{
 	}
+	int GetMidx() const
+	{
+		return x + height / 2;
+	}
+
+	int GetMidy() const
+	{
+		return y + width / 2;
+	}
+
+	std::pair<int, int> GetMid()
+	{
+		return std::make_pair(x + height / 2, y + width / 2);
+	}
 	int x;		// 시작점x
 	int y;		// 시작점 y
 	int height; // x의 길이
 	int width;  // y의 길이
+
 };
 
 class Node : public std::enable_shared_from_this<Node>

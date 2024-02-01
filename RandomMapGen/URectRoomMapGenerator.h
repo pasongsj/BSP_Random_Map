@@ -43,6 +43,8 @@ protected:
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
 	void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) override;
 
+	bool MakeRoad(const RectInt f_rect,const RectInt s_rect);
+
 private:
 
 	void CreateRoom(std::shared_ptr<Node> _leafNode);

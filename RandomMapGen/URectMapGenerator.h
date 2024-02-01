@@ -27,7 +27,7 @@ public:
 
 	}
 
-	~URectMapGenerator();
+	virtual ~URectMapGenerator();
 
 	// delete Function
 	URectMapGenerator(const URectMapGenerator& _Other) = delete;

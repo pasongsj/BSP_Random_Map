@@ -61,27 +61,6 @@ bool URectWallMapGenerator::CreateMap()
         }
     }
 
-    // -- test --
-    // 
-    //std::shared_ptr<Node> curNode = RootNode->MaxNode();
-    //int cnt = 1;
-    //while (nullptr != curNode)
-    //{
-    //    std::cout << cnt++<<' ';
-    //    curNode->PrintNode();
-    //    curNode = curNode->GetBeforeNode();
-    //}
-
-    //std::cout << '\n'<<'\n';
-    //
-    //cnt = 1;
-    //for (const std::shared_ptr<Node>& CurNode : LeafNodeList)
-    //{
-    //    std::cout << cnt++ << ' ';
-    //    CurNode->PrintNode();
-    //}
-    //std::cout << '\n';
-
 
     // -- test --
 

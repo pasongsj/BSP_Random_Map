@@ -51,6 +51,7 @@ bool URectRoomMapGenerator::CreateMap()
             }
         }
     }
+
     for (int i = 0; i < lx; ++i) // 랜덤맵 생성을 성공한 경우 cpy
     {
         for (int j = 0; j < ly; ++j)
@@ -59,9 +60,28 @@ bool URectRoomMapGenerator::CreateMap()
         }
     }
 
+    int index = 1;
     for (std::shared_ptr<Node> _leaf : LeafNodeList)
     {
+        //std::cout << index++ << ':' << _leaf->nodeRect.x << ' ' << _leaf->nodeRect.y << ' ' << _leaf->nodeRect.x + _leaf->nodeRect.height << ' ' << _leaf->nodeRect.y + _leaf->nodeRect.width << '\n';
         CreateRoom(_leaf);
+    }
+    auto it = LeafNodeList.begin();
+
+    for (int i = 1; i < LeafNodeList.size(); i++)
+    {
+		if (false == MakeRoad(LeafNodeList[i - 1]->nodeRect, LeafNodeList[i]->nodeRect))
+        {
+            if (i == 1)
+            {
+                int a = 0;
+            }
+            else
+            {
+                MakeRoad(LeafNodeList[i - 2]->nodeRect, LeafNodeList[i]->nodeRect);
+            }
+        }
+
     }
 
 
@@ -202,8 +222,14 @@ bool URectRoomMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
 
     // 여분비율을 낮춘다
     float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
-
-    return DivideNode(tree->leftNode, leftnodecnt, _size, nrate) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    if (true == is_height)
+    {
+        return DivideNode(tree->leftNode, leftnodecnt, _size, nrate) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    }
+    else
+    {
+        return DivideNode(tree->rightNode, rightnodecnt, _size, nrate) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    }
 
 }
 
@@ -254,6 +280,108 @@ void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
         }
     }
 }
+
+bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)
+{
+    // x축(세로)가 공통인지 확인
+    if ((f_rect.x <= s_rect.x && s_rect.x < f_rect.x + f_rect.height) || (f_rect.x >= s_rect.x && s_rect.x + s_rect.height > f_rect.x))
+    {
+		int midx = (f_rect.GetMidx() + s_rect.GetMidx() - 1) / 2;
+        int miny, maxy;
+
+ 
+        if (s_rect.GetMidy() > f_rect.GetMidy())
+        {
+            miny = f_rect.GetMidy()-1;
+			maxy = s_rect.GetMidy() + 1;
+        }
+        else
+        {
+            maxy = f_rect.GetMidy()+1;
+            miny = s_rect.GetMidy()-1;
+        }
+        for (int j = miny; j < maxy; ++j)
+        {
+            if (base_map[midx][j] == 1)
+            {
+                if (base_map[midx][j - 1] == 0 || base_map[midx][j + 1] == 0)
+                {
+                    base_map[midx][j] = 2;
+                }
+                else
+                {
+                    base_map[midx][j] = 3;
+                }
+            }
+        }
+        return true;
+    }
+    //else if (f_rect.x >= s_rect.x && s_rect.x + s_rect.height > f_rect.x)
+    //{
+    //    int midx = (f_rect.GetMidx() + s_rect.GetMidx()) / 2;
+    //    int miny, maxy;
+
+
+    //    if (s_rect.GetMidy() > f_rect.GetMidy())
+    //    {
+    //        miny = f_rect.GetMidy();
+    //        maxy = s_rect.GetMidy();
+    //    }
+    //    else
+    //    {
+    //        maxy = f_rect.GetMidy();
+    //        miny = s_rect.GetMidy();
+    //    }
+    //    for (int j = miny; j < maxy; ++j)
+    //    {
+    //        if (base_map[midx][j] == 1)
+    //        {
+    //            base_map[midx][j] = 3;
+    //        }
+    //    }
+
+    //}
+    // y 축(가로)가 공통인지 확인
+    else if ((f_rect.y <= s_rect.y && s_rect.y < f_rect.y + f_rect.width) || (f_rect.y > s_rect.y && s_rect.y + s_rect.width > f_rect.y))
+    {
+		int midy = (f_rect.GetMidy() + s_rect.GetMidy() - 1) / 2;
+        int minx, maxx;
+
+
+        if (s_rect.GetMidx() > f_rect.GetMidx())
+        {
+			minx = f_rect.GetMidx() - 1;
+			maxx = s_rect.GetMidx() + 1;
+        }
+        else
+        {
+			maxx = f_rect.GetMidx() + 1;
+			minx = s_rect.GetMidx() - 1;
+        }
+        for (int j = minx; j < maxx; ++j)
+        {
+            if (base_map[j][midy] == 1)
+            {
+				if (base_map[j - 1][midy] == 0 || base_map[j + 1][midy] == 0)
+                {
+                    base_map[j][midy] = 2;
+                }
+                else
+                {
+                    base_map[j][midy] = 3;
+                }
+            }
+        }
+        return true;
+    }
+    else
+    {
+        int a = 0;
+        return false;
+        // err
+    }
+}
+
 
 void URectRoomMapGenerator::CreateRoom(std::shared_ptr<Node> _leafNode)
 {
