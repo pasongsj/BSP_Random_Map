@@ -63,7 +63,7 @@ bool URectRoomMapGenerator::CreateMap()
     int index = 1;
     for (std::shared_ptr<Node> _leaf : LeafNodeList)
     {
-        //std::cout << index++ << ':' << _leaf->nodeRect.x << ' ' << _leaf->nodeRect.x + _leaf->nodeRect.height << ' ' << _leaf->nodeRect.y  <<  ' ' << _leaf->nodeRect.y + _leaf->nodeRect.width << '\n';
+        std::cout << index++ << ':' << _leaf->nodeRect.x << ' ' << _leaf->nodeRect.x + _leaf->nodeRect.height << ' ' << _leaf->nodeRect.y  <<  ' ' << _leaf->nodeRect.y + _leaf->nodeRect.width << '\n';
         CreateRoom(_leaf);
     }
     auto it = LeafNodeList.begin();
@@ -361,13 +361,13 @@ bool URectRoomMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
 
     // 여분비율을 낮춘다
     float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
-    if (false == is_reverse)
+    if (true == is_reverse) // 역순
     {
-        return DivideNode(tree->leftNode, leftnodecnt, _size, nrate, !is_reverse) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate, is_reverse); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return DivideNode(tree->rightNode, rightnodecnt, _size, nrate, true) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate, false); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
-    else
+    else // 정순
     {
-        return DivideNode(tree->rightNode, rightnodecnt, _size, nrate, !is_reverse) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate, is_reverse); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return DivideNode(tree->leftNode, leftnodecnt, _size, nrate, true) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate, false); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
 }
 
