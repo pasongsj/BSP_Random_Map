@@ -34,19 +34,19 @@ public:
 
 };
 
-class Node : public std::enable_shared_from_this<Node>
+class Node
 {
 public:
-	std::weak_ptr<Node> parNode;			// 부모노드
-	std::shared_ptr<Node> leftNode;			// 왼쪽 자식 노드
-	std::shared_ptr<Node> rightNode;		// 오른쪽 자식 노드
+	Node* parNode;			// 부모노드
+	Node* leftNode;			// 왼쪽 자식 노드
+	Node* rightNode;		// 오른쪽 자식 노드
 	RectInt nodeRect;		// 공간 정보
 
 	//생성자
 	Node(RectInt rect)
 	{
 		nodeRect = rect;
-		parNode;
+		parNode = nullptr;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
@@ -54,14 +54,14 @@ public:
 	Node()
 	{
 		nodeRect = { 0,0,0,0 };
-		parNode;
+		parNode = nullptr;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
 
 	~Node()
 	{
-		parNode;
+		parNode = nullptr;
 		leftNode = nullptr;
 		rightNode = nullptr;
 	}
@@ -73,7 +73,7 @@ public:
 	}
 
 	// 현재 노드 기준으로 왼쪽 끝
-	std::shared_ptr<Node> MinNode()
+	Node* MinNode()
 	{
 		if (nullptr != leftNode)
 		{
@@ -83,11 +83,11 @@ public:
 		{
 			return rightNode->MaxNode();
 		}
-		return shared_from_this();
+		return this;
 	}
 
 	// 현재 노드 기준으로 오른쪽 끝
-	std::shared_ptr<Node> MaxNode()
+	Node* MaxNode()
 	{
 		if (nullptr != rightNode)
 		{
@@ -97,29 +97,29 @@ public:
 		{
 			return leftNode->MaxNode();
 		}
-		return shared_from_this();
+		return this;
 	}
 
 	// 이전 리프노드
-	std::shared_ptr<Node> GetBeforeNode()
+	Node* GetBeforeNode()
 	{
-		if (!parNode.expired())
+		if (nullptr == parNode)
 		{
 			return nullptr;
 		}
 
 		// 오른쪽 노드면서
-		if (parNode.lock()->rightNode == shared_from_this())
+		if (parNode->rightNode == this)
 		{
-			if(nullptr != parNode.lock()->leftNode) // 왼쪽노드가 존재한다면
+			if(nullptr != parNode->leftNode) // 왼쪽노드가 존재한다면
 			{
-				return parNode.lock()->leftNode->MaxNode(); // 왼쪽노드의 max값
+				return parNode->leftNode->MaxNode(); // 왼쪽노드의 max값
 			}
-			return parNode.lock()->GetBeforeNode();
+			return parNode->GetBeforeNode();
 		}
 		else // 왼쪽 노드라면
 		{
-			std::shared_ptr<Node> lastpar = GetParentNode_RIghtChild();
+			Node* lastpar = GetParentNode_RIghtChild();
 			if (nullptr == lastpar)
 			{
 				return nullptr;
@@ -133,16 +133,16 @@ public:
 	}
 
 	// 이전 리프노드
-	std::shared_ptr<Node> GetParentNode_RIghtChild()
+	Node* GetParentNode_RIghtChild()
 	{
-		if (!parNode.expired())
+		if (nullptr == parNode)
 		{
 			return nullptr;
 		}
-		if (parNode.lock()->leftNode == shared_from_this())
+		if (parNode->leftNode == this)
 		{
-			return parNode.lock()->GetParentNode_RIghtChild();
+			return parNode->GetParentNode_RIghtChild();
 		}
-		return parNode.lock();
+		return parNode;
 	}
 };

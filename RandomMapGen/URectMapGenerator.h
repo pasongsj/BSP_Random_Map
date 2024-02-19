@@ -49,7 +49,7 @@ protected:
 	bool In_range(int x, int y);
 
 	// 현재 Node를 n개로 나누고싶다는 의미
-	virtual bool DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate) = 0;
+	virtual bool DivideNode(Node* tree, int n, int _size, float _rate) = 0;
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
 	virtual void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) = 0;
@@ -82,11 +82,11 @@ protected:
 	void CpyMap();
 
 	// generate완료 후 노드를 삭제하기 위함
-	void ReleaseNode(std::shared_ptr<Node> _cNode);
+	void ReleaseNode(Node* _cNode);
 
 
 
-	
+
 
 
 
@@ -105,8 +105,8 @@ protected:
 	int door_size;		// 두 자식노드 사이를 연결하는 문의 길이
 	float spare;			// 노드를 자를 때 최소 여분 영역 제공 비율
 
-	std::shared_ptr<Node> RootNode;		// 루트 노드
-	std::vector<std::shared_ptr<Node>> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)
+	Node* RootNode;		// 루트 노드
+	std::vector<Node*> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)
 
 
 private:

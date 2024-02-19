@@ -29,7 +29,7 @@ bool URectWallMapGenerator::CreateMap()
         // 맵 생성
         if (nullptr == RootNode)
         {
-            RootNode = std::make_shared<Node>();
+            RootNode = new Node();
             RootNode->nodeRect = { 1, 1, lx - 1, ly - 1 }; // 맵의 테두리를 제외한 크기의 루트노드
         }
         bool can_gen = DivideNode(RootNode, room_cnt, min_room_size, _rate);
@@ -91,7 +91,7 @@ bool URectWallMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _r
 
 
 // 현재 Node를 n개로 나누고싶다는 의미
-bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate)
+bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
 {
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
@@ -135,14 +135,14 @@ bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
     // 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
     if (leftSize == 0)
     {
-        tree->rightNode = std::make_shared<Node>();
+        tree->rightNode = new Node();
         tree->rightNode->nodeRect = RightRect;
         tree->rightNode->parNode = tree;
         return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
     else if (rightSize == 0)
     {
-        tree->leftNode = std::make_shared<Node>();
+        tree->leftNode = new Node();
         tree->leftNode->nodeRect = LeftRect;
         tree->leftNode->parNode = tree;
         return DivideNode(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
@@ -203,11 +203,11 @@ bool URectWallMapGenerator::DivideNode(std::shared_ptr<Node> tree, int n, int _s
         // 방의 최소 크기를 맞추기 위함이다.
 
         //왼쪽 노드에 대한 정보다 
-        tree->leftNode = std::make_shared<Node>();
+        tree->leftNode = new Node();
         tree->leftNode->nodeRect = LeftRect;
 
         //우측 노드에 대한 정보다 
-        tree->rightNode = std::make_shared<Node>();
+        tree->rightNode = new Node();
         tree->rightNode->nodeRect = RightRect;
 
         //그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        

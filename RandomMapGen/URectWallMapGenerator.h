@@ -39,7 +39,7 @@ public:
 protected:
 
 	// 현재 Node를 n개로 나누고싶다는 의미
-	bool DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate) override;
+	bool DivideNode(Node* tree, int n, int _size, float _rate) override;
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
 	void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) override;
