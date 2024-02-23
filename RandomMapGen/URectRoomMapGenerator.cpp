@@ -1,5 +1,4 @@
 #include "URectRoomMapGenerator.h"
-
 URectRoomMapGenerator::URectRoomMapGenerator() 
 {
 }
@@ -427,7 +426,8 @@ bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)
     // x축(세로)가 공통인지 확인
     if ((f_rect.x <= s_rect.x && s_rect.x < f_rect.x + f_rect.height) || (f_rect.x >= s_rect.x && s_rect.x + s_rect.height > f_rect.x))
     {
-		int midx = (f_rect.GetMidx() + s_rect.GetMidx() - 1) / 2;
+
+        int midx = (std::max(f_rect.x, s_rect.x) + std::min(f_rect.x + f_rect.height, s_rect.x + s_rect.height)) / 2;
         int miny, maxy;
 
  
@@ -460,7 +460,7 @@ bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)
     // y 축(가로)가 공통인지 확인
     else if ((f_rect.y <= s_rect.y && s_rect.y < f_rect.y + f_rect.width) || (f_rect.y > s_rect.y && s_rect.y + s_rect.width > f_rect.y))
     {
-		int midy = (f_rect.GetMidy() + s_rect.GetMidy() - 1) / 2;
+        int midy = (std::max(f_rect.y, s_rect.y) + std::min(f_rect.y + f_rect.width, s_rect.y + s_rect.width)) / 2;
         int minx, maxx;
 
 
