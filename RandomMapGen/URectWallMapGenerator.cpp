@@ -197,6 +197,26 @@ bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
             }
             else
             {
+                if (is_height)
+                {
+                    if (
+                        curRect.y + curRect.width < lx && 2 == try_map_gen[curRect.x + split][curRect.y + curRect.width] ||
+                        2 == try_map_gen[curRect.x + split][curRect.y - 1]
+                        )
+                    {
+                        split++;
+                    }
+                }
+                else
+                {
+                    if (
+                        curRect.x + curRect.height < ly && 2 == try_map_gen[curRect.x + curRect.height][curRect.y + split] ||
+                        2 == try_map_gen[curRect.x - 1][curRect.y + split]
+                        )
+                    {
+                        split++;
+                    }
+                }
                 break;
             }
         }
