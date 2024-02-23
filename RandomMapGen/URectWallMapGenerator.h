@@ -7,7 +7,7 @@ class URectWallMapGenerator : public URectMapGenerator
 public:
 	// constrcuter destructer
 	URectWallMapGenerator();
-	URectWallMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+	URectWallMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 	{
 		base_map = _map;
 
@@ -34,7 +34,7 @@ public:
 
 	bool CreateMap() override;
 
-	bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
+	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
 
 protected:
 

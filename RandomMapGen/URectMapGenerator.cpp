@@ -40,11 +40,11 @@ void URectMapGenerator::SetWallBFS(int x, int y)
             int ny = cy + dy[i];
             if (true == In_range(nx, ny))
             {
-                if (0 == base_map[nx][ny])
+                if (EMapGeneratorData::Ground == base_map[nx][ny])
                 {
-                    base_map[nx][ny] = 1;
+                    base_map[nx][ny] = EMapGeneratorData::Wall;
                 }
-                else if (-1 == base_map[nx][ny] && false == is_visited[nx][ny])
+                else if (EMapGeneratorData ::VoidTile == base_map[nx][ny] && false == is_visited[nx][ny])
                 {
                     dfsq.push(std::make_pair(nx, ny));
                     is_visited[nx][ny] = true;
@@ -63,7 +63,7 @@ void URectMapGenerator::CalMapSizeIndex()
         for (int j = 1; j < ly; ++j)
         {
             map_size_Index[i][j] = map_size_Index[i - 1][j] + map_size_Index[i][j - 1] - map_size_Index[i - 1][j - 1];
-            if (base_map[i][j] == 0)
+            if (EMapGeneratorData::Ground == base_map[i][j])
             {
                 map_size_Index[i][j]++;
             }
@@ -131,21 +131,6 @@ void URectMapGenerator::GetChildRect(const RectInt& _cur, int _split, bool is_he
     }
 }
 
-void URectMapGenerator::Print()
-{
-    for (int i = 0; i < base_map.size(); ++i)
-    {
-        for (int j = 0; j < base_map[0].size(); ++j)
-        {
-            if (base_map[i][j] >= 0)
-            {
-                std::cout << ' ';
-            }
-            std::cout << base_map[i][j] << ' ';
-        }
-        std::cout << '\n';
-    }
-}
 
 
 bool URectMapGenerator::CreateMap()
@@ -161,13 +146,13 @@ bool URectMapGenerator::CreateMap()
                 continue;
             }
 
-            if (base_map[i][j] == -1)// -1인 부분이 있다면 BFS를 통해 주변에 벽을 세움
+            if (EMapGeneratorData::VoidTile == base_map[i][j])// -1인 부분이 있다면 BFS를 통해 주변에 벽을 세움
             {
                 SetWallBFS(i, j);
             }
-            else if (0 == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1)) // 테두리부분에도 벽을 세움
+            else if (EMapGeneratorData::Ground == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1)) // 테두리부분에도 벽을 세움
             {
-                base_map[i][j] = 1;
+                base_map[i][j] = EMapGeneratorData::Wall;
             }
             is_visited[i][j] = true;
         }
@@ -179,7 +164,7 @@ bool URectMapGenerator::CreateMap()
     return true;
 }
 
-bool URectMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 {
     base_map = _map;
 
@@ -194,4 +179,20 @@ bool URectMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomc
 
 
     return CreateMap();
+}
+
+
+#include <map>
+
+void URectMapGenerator::Print()
+{
+    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"땅"},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X"},{EMapGeneratorData::Passage, "통"}};
+        for (int i = 0; i < base_map.size(); ++i)
+        {
+            for (int j = 0; j < base_map[0].size(); ++j)
+            {
+                std::cout << printmatch[base_map[i][j]] << ' ';
+            }
+            std::cout << '\n';
+        }
 }

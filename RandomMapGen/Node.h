@@ -146,3 +146,12 @@ public:
 		return parNode;
 	}
 };
+
+enum class EMapGeneratorData /*: uint8*/
+{
+	Ground, //UMETA(DisplayName = "땅"),
+	Wall, // UMETA(DisplayName = "벽"),
+	Door, //UMETA(DisplayName = "문"),
+	Passage, //방을 연결하는 통로
+	VoidTile, //UMETA(DisplayName = "만들면 안되는 타일"),
+};

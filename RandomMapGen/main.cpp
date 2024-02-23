@@ -11,12 +11,12 @@ int main()
 
 	//int* a = new int();
 
-	std::vector<std::vector<int>> Map;
-	Map.resize(40);
-	for (int i = 0; i < 40; ++i)
-	{
-		Map[i].resize(40);
-	}
+	std::vector<std::vector<EMapGeneratorData>> Map(40,std::vector< EMapGeneratorData>(40, EMapGeneratorData::Ground));
+	//Map.resize(40);
+	//for (int i = 0; i < 40; ++i)
+	//{
+	//	Map[i].resize(40);
+	//}
 	
 	//for (int i = 0; i < 15; ++i)
 	//{
@@ -52,7 +52,7 @@ int main()
 
 	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
-	URectMapGenerator* NewMap = new URectWallMapGenerator(Map, 20, 5, 1);
+	URectMapGenerator* NewMap = new URectRoomMapGenerator(Map, 20, 5, 1);
 	if (true == NewMap->CreateMap())
 	{
 		NewMap->Print();

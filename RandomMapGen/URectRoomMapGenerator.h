@@ -7,7 +7,7 @@ class URectRoomMapGenerator : public URectMapGenerator
 public:
 	// constrcuter destructer
 	URectRoomMapGenerator();
-	URectRoomMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+	URectRoomMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 	{
 		base_map = _map;
 
@@ -32,7 +32,7 @@ public:
 	URectRoomMapGenerator& operator=(URectRoomMapGenerator&& _Other) noexcept = delete;
 
 	bool CreateMap() override;
-	bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
+	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
 
 
 protected:

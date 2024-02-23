@@ -74,7 +74,7 @@ bool URectWallMapGenerator::CreateMap()
 }
 
 
-bool URectWallMapGenerator::CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 {
     base_map = _map;
 
@@ -200,8 +200,8 @@ bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
                 if (is_height)
                 {
                     if (
-                        curRect.y + curRect.width < lx && 2 == try_map_gen[curRect.x + split][curRect.y + curRect.width] ||
-                        2 == try_map_gen[curRect.x + split][curRect.y - 1]
+                        curRect.y + curRect.width < lx && EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y + curRect.width] ||
+                        EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y - 1]
                         )
                     {
                         split++;
@@ -210,8 +210,8 @@ bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
                 else
                 {
                     if (
-                        curRect.x + curRect.height < ly && 2 == try_map_gen[curRect.x + curRect.height][curRect.y + split] ||
-                        2 == try_map_gen[curRect.x - 1][curRect.y + split]
+                        curRect.x + curRect.height < ly && EMapGeneratorData::Door == try_map_gen[curRect.x + curRect.height][curRect.y + split] ||
+                        EMapGeneratorData::Door == try_map_gen[curRect.x - 1][curRect.y + split]
                         )
                     {
                         split++;
@@ -254,17 +254,17 @@ void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
         int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
         for (int i = _cur.y; i < _cur.y + _cur.width; ++i)
         {
-            if (0 == try_map_gen[_cur.x + splite][i])
+            if (EMapGeneratorData::Ground == try_map_gen[_cur.x + splite][i])
             {
-                try_map_gen[_cur.x + splite][i] = 1;
+                try_map_gen[_cur.x + splite][i] = EMapGeneratorData::Wall;
             }
         }
 
 		for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
 		{
-			if (try_map_gen[_cur.x + splite][i] != -1)
+			if (EMapGeneratorData::VoidTile != try_map_gen[_cur.x + splite][i])
 			{
-				try_map_gen[_cur.x + splite][i] = 2;
+				try_map_gen[_cur.x + splite][i] = EMapGeneratorData::Door;
 			}
 		}
         
@@ -277,17 +277,17 @@ void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
         int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - diff, mid + diff);
         for (int i = _cur.x; i < _cur.x + _cur.height; ++i)
         {
-            if (0 == try_map_gen[i][_cur.y + splite])
+            if (EMapGeneratorData::Ground == try_map_gen[i][_cur.y + splite])
             {
-                try_map_gen[i][_cur.y + splite] = 1;
+                try_map_gen[i][_cur.y + splite] = EMapGeneratorData::Wall;
             }
         }
 
 		for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
 		{
-			if (try_map_gen[i][_cur.y + splite] != -1)
+			if (EMapGeneratorData::VoidTile != try_map_gen[i][_cur.y + splite])
 			{
-				try_map_gen[i][_cur.y + splite] = 2;
+				try_map_gen[i][_cur.y + splite] = EMapGeneratorData::Door;
 			}
 		}
 

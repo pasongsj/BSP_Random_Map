@@ -10,7 +10,7 @@ public:
 	// constrcuter destructer
 	URectMapGenerator();
 
-	URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+	URectMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 	{
 		base_map = _map;
 
@@ -38,7 +38,7 @@ public:
 
 	void Print();
 	virtual bool CreateMap();
-	virtual bool CreateMap(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize);
+	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize);
 
 protected:
 
@@ -91,10 +91,10 @@ protected:
 
 
 
-	std::vector<std::vector<int>>	base_map;
+	std::vector<std::vector<EMapGeneratorData>>	base_map;
 	std::vector<std::vector<bool>>	is_visited;		// SetWallBFS()에서 중복체크를 피하기 위함
 	std::vector<std::vector<int>>	map_size_Index;		// RectInt에 해당하는 부분의 넓이를 빠르게 구하기 위함
-	std::vector<std::vector<int>>	try_map_gen;			// 랜덤맵 생성 가능여부를 테스트하기 위함
+	std::vector<std::vector<EMapGeneratorData>>	try_map_gen;			// 랜덤맵 생성 가능여부를 테스트하기 위함
 
 	int lx;		// 맵의 세로길이
 	int ly;		// 맵의 가로길이
