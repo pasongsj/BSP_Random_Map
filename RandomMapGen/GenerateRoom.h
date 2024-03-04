@@ -2,11 +2,12 @@
 #include <vector>
 #include "Node.h"
 
-enum MapType
+enum class MapType
 {
 	WallType,
 	RoomType
 };
+
 
 // Ό³Έν :
 class GenerateRoom

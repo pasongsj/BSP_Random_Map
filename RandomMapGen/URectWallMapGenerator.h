@@ -32,9 +32,9 @@ public:
 	URectWallMapGenerator& operator=(const URectWallMapGenerator& _Other) = delete;
 	URectWallMapGenerator& operator=(URectWallMapGenerator&& _Other) noexcept = delete;
 
-	bool CreateMap() override;
+	//bool CreateMap() override;
 
-	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
+	//bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
 
 protected:
 

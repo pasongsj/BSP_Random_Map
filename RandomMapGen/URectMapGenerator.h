@@ -9,7 +9,6 @@ class URectMapGenerator
 public:
 	// constrcuter destructer
 	URectMapGenerator();
-
 	URectMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 	{
 		base_map = _map;
@@ -25,6 +24,26 @@ public:
 
 		RootNode = nullptr;
 
+		CurMapShape = MapShape::none;
+	}
+
+
+	URectMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape)
+	{
+		base_map = _map;
+
+		lx = static_cast<int>(_map.size());
+		ly = static_cast<int>(_map[0].size());
+
+		room_cnt = _roomcnt;
+		min_room_size = _min_room_size;
+		door_size = _doorsize;
+
+		spare = 0.8f;
+
+		RootNode = nullptr;
+
+		CurMapShape = _shape;
 	}
 
 	virtual ~URectMapGenerator();
@@ -38,7 +57,10 @@ public:
 
 	void Print();
 	virtual bool CreateMap();
-	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize);
+	//virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize);
+	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none);
+
+	void SettingMapShap();
 
 protected:
 
@@ -107,6 +129,13 @@ protected:
 
 	Node* RootNode;		// 루트 노드
 	std::vector<Node*> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)
+
+	std::vector<Node*> ShapeList;
+
+	void RemoveRect(RectInt CurRect);
+	void DrawRect(RectInt& CurRect);
+
+	MapShape CurMapShape;
 
 
 private:

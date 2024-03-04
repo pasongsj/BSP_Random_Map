@@ -18,42 +18,42 @@ int main()
 	//	Map[i].resize(40);
 	//}
 	
-	//for (int i = 0; i < 15; ++i)
+	//for (int i = 0; i < 10; ++i)
 	//{
-	//	for (int j = 0; j < 15; ++j)
+	//	for (int j = 0; j < 10; ++j)
 	//	{
-	//		Map[i][j] = -1;
+	//		Map[i][j] = EMapGeneratorData::VoidTile;
 	//	}
 	//}
 	//
-	//for (int i = 0; i < 15; ++i)
+	//for (int i = 0; i < 10; ++i)
 	//{
-	//	for (int j = 25; j < 40; ++j)
+	//	for (int j = 30; j < 40; ++j)
 	//	{
-	//		Map[i][j] = -1;
+	//		Map[i][j] = EMapGeneratorData::VoidTile;
 	//	}
 	//}
 	//
-	//for (int i = 25; i < 40; ++i)
+	//for (int i = 30; i < 40; ++i)
 	//{
-	//	for (int j = 0; j < 15; ++j)
+	//	for (int j = 0; j < 10; ++j)
 	//	{
-	//		Map[i][j] = -1;
+	//		Map[i][j] = EMapGeneratorData::VoidTile;
 	//	}
 	//}
 	//
-	//for (int i = 25; i < 40; ++i)
+	//for (int i = 30; i < 40; ++i)
 	//{
-	//	for (int j = 25; j < 40; ++j)
+	//	for (int j = 30; j < 40; ++j)
 	//	{
-	//		Map[i][j] = -1;
+	//		Map[i][j] = EMapGeneratorData::VoidTile;
 	//	}
 	//}
 
 	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
-	URectMapGenerator* NewMap = new URectRoomMapGenerator(Map, 20, 5, 1);
-	if (true == NewMap->CreateMap())
+	URectMapGenerator* NewMap = new URectRoomMapGenerator();
+	if (true == NewMap->CreateMap(Map, 15, 3, 1, MapShape::cross))
 	{
 		NewMap->Print();
 	}

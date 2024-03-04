@@ -155,3 +155,13 @@ enum class EMapGeneratorData /*: uint8*/
 	Passage, //방을 연결하는 통로
 	VoidTile, //UMETA(DisplayName = "만들면 안되는 타일"),
 };
+
+
+enum class MapShape
+{
+	none,
+	giyeok,
+	digeut,
+	mieum,
+	cross,
+};

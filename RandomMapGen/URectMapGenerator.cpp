@@ -8,6 +8,12 @@ URectMapGenerator::URectMapGenerator()
 
 URectMapGenerator::~URectMapGenerator() 
 {
+    for (Node* _node : ShapeList)
+    {
+        delete _node;
+        _node = nullptr;
+    }
+    ShapeList.clear();
 }
 
 void URectMapGenerator::Init()
@@ -17,6 +23,8 @@ void URectMapGenerator::Init()
     map_size_Index.clear();
     map_size_Index = std::vector<std::vector<int>>(lx, std::vector<int>(ly, 0));
 }
+
+
 
 
 void URectMapGenerator::SetWallBFS(int x, int y)
@@ -131,40 +139,191 @@ void URectMapGenerator::GetChildRect(const RectInt& _cur, int _split, bool is_he
     }
 }
 
+void URectMapGenerator::RemoveRect(RectInt CurRect)
+{
+    for (int i = CurRect.x; i <= CurRect.x + CurRect.height; ++i)
+    {
+        for (int j = CurRect.y; j <= CurRect.y + CurRect.width; ++j)
+        {
+            base_map[i][j] = EMapGeneratorData::VoidTile;
+        }
+    }
+}
+
+void URectMapGenerator::DrawRect(RectInt& _CurRect)
+{
+    for (int i = _CurRect.x; i <= _CurRect.x + _CurRect.height; ++i)
+    {
+        base_map[i][_CurRect.y] = EMapGeneratorData::Wall;
+        base_map[i][_CurRect.y+_CurRect.width] = EMapGeneratorData::Wall;
+    }
+    for (int j = _CurRect.y; j <= _CurRect.y + _CurRect.width; ++j)
+    {
+        base_map[_CurRect.x][j] = EMapGeneratorData::Wall;
+        base_map[_CurRect.x+ _CurRect.height][j] = EMapGeneratorData::Wall;
+    }
+    _CurRect.x++;
+    _CurRect.y++;
+    _CurRect.height--;
+    _CurRect.width--;
+}
+
+
+void URectMapGenerator::SettingMapShap()
+{
+    if (MapShape::none == CurMapShape)
+    {
+        RectInt holeRect = { 0,0,lx - 1,ly - 1 };
+        DrawRect(holeRect);
+        return;
+    }
+    else if (MapShape::giyeok == CurMapShape)
+    {
+		int split_x[3] = { 0, 0,lx - 1 };
+		int split_y[3] = { 0, 0,ly - 1 };
+        split_x[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx / 2));
+
+        split_y[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (ly / 2));
+
+		std::vector<RectInt> allRect;
+		allRect.push_back({ split_x[0],split_y[0],split_x[1] - split_x[0],split_y[1] - split_y[0] });
+
+		allRect.push_back({ split_x[0],split_y[1],split_x[1] - split_x[0],split_y[2] - split_y[1] });
+
+		allRect.push_back({ split_x[1],split_y[1],split_x[2] - split_x[1],split_y[2] - split_y[1] });
+
+		allRect.push_back({ split_x[1],split_y[0],split_x[2] - split_x[1],split_y[1] - split_y[0] });
+
+        int RemovePos = GameEngineRandom::MainRandom.RandomInt(0, 3);
+
+        RemoveRect(allRect[RemovePos]);
+
+        for (int i = 1; i < 4; ++i)
+        {
+            Node* curNode = new Node();
+            DrawRect(allRect[(RemovePos + i) % 4]);
+            curNode->nodeRect = allRect[(RemovePos + i) % 4];
+            ShapeList.push_back(curNode);
+        }
+    }
+    else
+    {
+        int split_x[4] = { 0, 0,0,lx-1 };
+        int split_y[4] = { 0, 0,0,ly-1 };
+        split_x[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx / 3));
+        split_x[2] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx * 2 / 3));
+
+        split_y[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (ly / 3));
+        split_y[2] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (ly * 2 / 3));
+
+        std::vector<RectInt> allRect;
+        for (int i = 0; i < 3; ++i)
+        {
+            for (int j = 0; j < 3; ++j)
+            {
+                allRect.push_back({ split_x[i],split_y[j],split_x[i + 1] - split_x[i],split_y[j + 1] - split_y[j]});
+            }
+        }
+
+		int pos[8] = { 1,2,5,8,7,6,3,0 };
+        switch (CurMapShape)
+        {
+        case MapShape::digeut:
+        {
+			int RemovePos = GameEngineRandom::MainRandom.RandomInt(0, 3) * 2;
+
+            RemoveRect(allRect[pos[RemovePos]]);
+            RemoveRect(allRect[4]);
+            for (int i = 1; i < 8; ++i)
+            {
+                Node* curNode = new Node();
+				DrawRect(allRect[pos[(i + RemovePos) % 8]]);
+                curNode->nodeRect = allRect[pos[(i + RemovePos) % 8]];
+                ShapeList.push_back(curNode);
+            }
+
+            break;
+        }
+        case MapShape::mieum:
+        {
+            RemoveRect(allRect[4]);
+            for (int i = 0; i < 8; ++i)
+            {
+                Node* curNode = new Node();
+                DrawRect(allRect[i]);
+
+                curNode->nodeRect = allRect[i];
+                ShapeList.push_back(curNode);
+            }
+            break;
+        }
+        case MapShape::cross:
+        {
+
+            RemoveRect(allRect[0]);
+            RemoveRect(allRect[2]);
+            RemoveRect(allRect[6]);
+            RemoveRect(allRect[8]);
+            {
+                Node* curNode = new Node();
+                DrawRect(allRect[4]);
+                curNode->nodeRect = allRect[4];
+                ShapeList.push_back(curNode);
+            }
+            for (int i = 1; i < 8; i += 2)
+            {
+                Node* curNode = new Node();
+                DrawRect(allRect[i]);
+                curNode->nodeRect = allRect[i];
+                ShapeList.push_back(curNode);
+            }
+            break;
+        }
+        default:
+            break;
+        }
+    }
+	
+
+}
 
 
 bool URectMapGenerator::CreateMap()
 {
     Init();
+    SettingMapShap();
     // 맵이 없는 부분(-1)확인,
-    for (int i = 0; i < lx; ++i)
-    {
-        for (int j = 0; j < ly; ++j)
-        {
-            if (true == is_visited[i][j])
-            {
-                continue;
-            }
+    //for (int i = 0; i < lx; ++i)
+    //{
+    //    for (int j = 0; j < ly; ++j)
+    //    {
+    //        if (true == is_visited[i][j])
+    //        {
+    //            continue;
+    //        }
 
-            if (EMapGeneratorData::VoidTile == base_map[i][j])// -1인 부분이 있다면 BFS를 통해 주변에 벽을 세움
-            {
-                SetWallBFS(i, j);
-            }
-            else if (EMapGeneratorData::Ground == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1)) // 테두리부분에도 벽을 세움
-            {
-                base_map[i][j] = EMapGeneratorData::Wall;
-            }
-            is_visited[i][j] = true;
-        }
-    }
+    //        if (EMapGeneratorData::VoidTile == base_map[i][j])// -1인 부분이 있다면 BFS를 통해 주변에 벽을 세움
+    //        {
+    //            SetWallBFS(i, j);
+    //        }
+    //        else if (EMapGeneratorData::Ground == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1)) // 테두리부분에도 벽을 세움
+    //        {
+    //            base_map[i][j] = EMapGeneratorData::Wall;
+    //        }
+    //        is_visited[i][j] = true;
+    //    }
+    //}
 
-    // 맵 크기를 빠르게 계산하기 위함
+    //// 맵 크기를 빠르게 계산하기 위함
     CalMapSizeIndex();
+
+    CpyMap();
+
 
     return true;
 }
 
-bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
+bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape)
 {
     base_map = _map;
 
@@ -176,17 +335,18 @@ bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _m
     door_size = _doorsize;
 
     spare = 0.8f;
-
+    CurMapShape = _shape;
 
     return CreateMap();
 }
+
 
 
 #include <map>
 
 void URectMapGenerator::Print()
 {
-    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"땅"},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X"},{EMapGeneratorData::Passage, "통"}};
+    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"땅"},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "통"}};
         for (int i = 0; i < base_map.size(); ++i)
         {
             for (int j = 0; j < base_map[0].size(); ++j)

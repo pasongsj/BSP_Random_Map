@@ -7,6 +7,7 @@
     <ClInclude Include="URectMapGenerator.h" />
     <ClInclude Include="URectWallMapGenerator.h" />
     <ClInclude Include="URectRoomMapGenerator.h" />
+    <ClInclude Include="URectCaveMapGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Node.cpp" />
@@ -16,5 +17,6 @@
     <ClCompile Include="URectMapGenerator.cpp" />
     <ClCompile Include="URectWallMapGenerator.cpp" />
     <ClCompile Include="URectRoomMapGenerator.cpp" />
+    <ClCompile Include="URectCaveMapGenerator.cpp" />
   </ItemGroup>
 </Project>
