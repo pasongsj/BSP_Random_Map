@@ -51,12 +51,12 @@ bool URectRoomMapGenerator::CreateMap()
 
                 if (remain_room > 0)
                 {
-                    can_gen = can_gen && DivideNode(Roots, room_cnt / ShapeList.size() + 1, min_room_size, _rate, true);
+                    can_gen = can_gen && DivideNode(Roots, room_cnt / static_cast<int>(ShapeList.size()) + 1, min_room_size, _rate, true);
                     remain_room--;
                 }
                 else
                 {
-                    can_gen = can_gen && DivideNode(Roots, room_cnt / ShapeList.size(), min_room_size, _rate, true);
+                    can_gen = can_gen && DivideNode(Roots, room_cnt / static_cast<int>(ShapeList.size()), min_room_size, _rate, true);
                 }
             }
         }
@@ -126,6 +126,7 @@ bool URectRoomMapGenerator::CreateMap()
         {
             ConnectRoom(ShapeList[i], ShapeList[i+1]);
         }
+        ConnectRoom(ShapeList[ShapeList.size() - 1]);
         break;
     case MapShape::cross:
         for (int i = 1; i < 5; ++i)
@@ -137,22 +138,7 @@ bool URectRoomMapGenerator::CreateMap()
     default:
         break;
     }
-    // 방 연결하기
-  //  for (int i = 1; i < LeafNodeList.size(); i++)
-  //  {
-		//if (false == MakeRoad(LeafNodeList[i - 1]->nodeRect, LeafNodeList[i]->nodeRect))
-  //      {
-  //          if (i == 1)
-  //          {
-  //              int a = 0;
-  //          }
-  //          else
-  //          {
-  //              MakeRoad(LeafNodeList[i - 2]->nodeRect, LeafNodeList[i]->nodeRect);
-  //          }
-  //      }
 
-  //  }
          //방 모양 만들기
     for (Node* _leaf : LeafNodeList)
     {
@@ -162,6 +148,10 @@ bool URectRoomMapGenerator::CreateMap()
     // 노드 release
     LeafNodeList.clear();
     ReleaseNode(RootNode);
+    for (Node* _node : ShapeList)
+    {
+        ReleaseNode(_node);
+    }
     RootNode = nullptr;
 
     return true;
@@ -265,6 +255,10 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node)
 // 현재 Node를 n개로 나누고싶다는 의미
 bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
 {
+    if (n == 0)
+    {
+        return true;
+    }
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
         if (_size > GetRoomSize(tree->nodeRect)) // 최소 방 크기를 만족하지 않는다면
@@ -367,7 +361,7 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
             {
                 split--;
             }
-            else if (maxLength / 2 == split)
+            else if ((maxLength-1) / 2 == split)
             {
                 split++;
             }
@@ -409,6 +403,10 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
 
 bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate, bool is_reverse)
 {
+    if (n == 0)
+    {
+        return true;
+    }
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
         if (_size > GetRoomSize(tree->nodeRect)) // 최소 방 크기를 만족하지 않는다면
@@ -751,11 +749,11 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         //if (CurRect.width >= 3 && CurRect.height >= 3)
         {
 
-            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x, CurRect.x + CurRect.height / 5);
-            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y, CurRect.y + CurRect.width / 5);
+			int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x + 1, CurRect.x + CurRect.height / 5);
+			int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y + 1, CurRect.y + CurRect.width / 5);
 
-			int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x ) * 4 / 5, CurRect.x + CurRect.height - start_x );
-			int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y ) * 4 / 5, CurRect.y + CurRect.width - start_y );
+			int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x - 1) * 4 / 5, CurRect.x + CurRect.height - start_x - 1);
+			int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y - 1) * 4 / 5, CurRect.y + CurRect.width - start_y - 1);
 
 
             for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
@@ -813,9 +811,9 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             int d_x = CurRect.x + point_x * 2;
             int d_y = CurRect.y + point_y;
 
-            for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+            for (int i = CurRect.x-1; i < CurRect.x + CurRect.height; ++i)
             {
-                for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+                for (int j = CurRect.y-1; j < CurRect.y + CurRect.width; ++j)
                 {
                     //| x - centerX | / a + | y - centerY | / b <= 1 마름모 내부
                     if (abs(i - (CurRect.x + point_x)) * point_y + abs(j - (CurRect.y + point_y)) * point_x <= point_x * point_y)

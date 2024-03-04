@@ -11,7 +11,7 @@ int main()
 
 	//int* a = new int();
 
-	std::vector<std::vector<EMapGeneratorData>> Map(80,std::vector< EMapGeneratorData>(80, EMapGeneratorData::Ground));
+	std::vector<std::vector<EMapGeneratorData>> Map(50,std::vector< EMapGeneratorData>(50, EMapGeneratorData::Ground));
 	//Map.resize(40);
 	//for (int i = 0; i < 40; ++i)
 	//{
@@ -53,7 +53,7 @@ int main()
 	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
 	URectMapGenerator* NewMap = new URectRoomMapGenerator();
-	if (true == NewMap->CreateMap(Map, 7, 3, 1, MapShape::mieum))
+	if (true == NewMap->CreateMap(Map,16, 3, 1, MapShape::mieum))
 	{
 		NewMap->Print();
 	}

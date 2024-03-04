@@ -8,12 +8,6 @@ URectMapGenerator::URectMapGenerator()
 
 URectMapGenerator::~URectMapGenerator() 
 {
-    for (Node* _node : ShapeList)
-    {
-        delete _node;
-        _node = nullptr;
-    }
-    ShapeList.clear();
 }
 
 void URectMapGenerator::Init()
@@ -250,8 +244,8 @@ void URectMapGenerator::SettingMapShap()
             for (int i = 0; i < 8; ++i)
             {
                 Node* curNode = new Node();
-                DrawRect(allRect[i]);
-                curNode->nodeRect = allRect[i];
+                DrawRect(allRect[pos[i]]);
+                curNode->nodeRect = allRect[pos[i]];
                 ShapeList.push_back(curNode);
             }
             break;
