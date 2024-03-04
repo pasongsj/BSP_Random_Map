@@ -251,7 +251,6 @@ void URectMapGenerator::SettingMapShap()
             {
                 Node* curNode = new Node();
                 DrawRect(allRect[i]);
-
                 curNode->nodeRect = allRect[i];
                 ShapeList.push_back(curNode);
             }

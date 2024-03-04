@@ -15,17 +15,17 @@ public:
 	}
 	int GetMidx() const
 	{
-		return x + height / 2;
+		return x + (height - 1) / 2;
 	}
 
 	int GetMidy() const
 	{
-		return y + width / 2;
+		return y + (width-1) / 2;
 	}
 
 	std::pair<int, int> GetMid()
 	{
-		return std::make_pair(x + height / 2, y + width / 2);
+		return std::make_pair(x + (height - 1) / 2, y + (width - 1) / 2);
 	}
 	int x;		// 시작점x
 	int y;		// 시작점 y

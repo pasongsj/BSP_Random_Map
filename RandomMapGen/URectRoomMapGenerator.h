@@ -64,9 +64,11 @@ protected:
 
 	bool MakeRoad(const RectInt f_rect,const RectInt s_rect);
 
+
 private:
 
 	void CreateRoom(Node* _leafNode);
+	bool ConnectRoom(Node* main_node, Node* sub_node = nullptr);
 
 };
 
