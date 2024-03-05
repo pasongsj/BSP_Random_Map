@@ -167,6 +167,11 @@ bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
 // 현재 Node를 n개로 나누고싶다는 의미
 bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
 {
+    if (n == 0)
+    {
+        FillTryMapRect(tree->nodeRect, EMapGeneratorData::Wall);
+        return true;
+    }
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때
     {
         if (_size > GetRoomSize(tree->nodeRect)) // 최소 방 크기를 만족하지 않는다면

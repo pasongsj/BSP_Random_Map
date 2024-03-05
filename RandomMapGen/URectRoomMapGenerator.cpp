@@ -257,6 +257,7 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
 {
     if (n == 0)
     {
+        FillTryMapRect(tree->nodeRect, EMapGeneratorData::Wall);
         return true;
     }
     if (n == 1) // 더이상 방을 나눌 필요가 없을 때

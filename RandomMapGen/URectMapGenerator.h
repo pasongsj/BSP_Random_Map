@@ -133,6 +133,7 @@ protected:
 
 	void RemoveRect(RectInt CurRect);
 	void DrawRect(RectInt& CurRect);
+	void FillTryMapRect(RectInt CurRect,EMapGeneratorData _data);
 
 	MapShape CurMapShape;
 

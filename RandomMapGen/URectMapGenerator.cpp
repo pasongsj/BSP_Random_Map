@@ -144,6 +144,18 @@ void URectMapGenerator::RemoveRect(RectInt CurRect)
     }
 }
 
+void URectMapGenerator::FillTryMapRect(RectInt CurRect, EMapGeneratorData _data)
+{
+    for (int i = CurRect.x; i <= CurRect.x + CurRect.height; ++i)
+    {
+        for (int j = CurRect.y; j <= CurRect.y + CurRect.width; ++j)
+        {
+            try_map_gen[i][j] = _data;
+        }
+    }
+}
+
+
 void URectMapGenerator::DrawRect(RectInt& _CurRect)
 {
     for (int i = _CurRect.x; i <= _CurRect.x + _CurRect.height; ++i)
