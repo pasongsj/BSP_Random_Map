@@ -52,8 +52,8 @@ int main()
 
 	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
-	URectMapGenerator* NewMap = new URectRoomMapGenerator();
-	if (true == NewMap->CreateMap(Map,16, 3, 1, MapShape::mieum))
+	URectMapGenerator* NewMap = new URectWallMapGenerator();
+	if (true == NewMap->CreateMap(Map,16, 3, 1, MapShape::giyeok))
 	{
 		NewMap->Print();
 	}

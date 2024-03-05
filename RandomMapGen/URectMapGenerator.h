@@ -88,7 +88,7 @@ protected:
 	void Init();
 
 	// 땅이 없는 부분(-1)의 테두리에 벽을 세우는 함수
-	void SetWallBFS(int x, int y);
+	//void SetWallBFS(int x, int y);
 
 	// 해당 인덱스까지 모든 넓이의 합을 dp로 구함
 	void CalMapSizeIndex();
@@ -129,7 +129,6 @@ protected:
 
 	Node* RootNode;		// 루트 노드
 	std::vector<Node*> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)
-
 	std::vector<Node*> ShapeList;
 
 	void RemoveRect(RectInt CurRect);

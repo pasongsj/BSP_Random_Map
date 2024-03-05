@@ -559,8 +559,6 @@ bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
 
     spare = 0.8f;
     CurMapShape = _Shape;
-    //MakeShape(_Shape);
-    //return true;
     return URectRoomMapGenerator::CreateMap();
 }
 
@@ -594,83 +592,83 @@ void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
         }
     }
 }
-
-bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)
-{
-    // x축(세로)가 공통인지 확인
-    if ((f_rect.x <= s_rect.x && s_rect.x < f_rect.x + f_rect.height) || (f_rect.x >= s_rect.x && s_rect.x + s_rect.height > f_rect.x))
-    {
-
-        int midx = (std::max(f_rect.x, s_rect.x) + std::min(f_rect.x + f_rect.height, s_rect.x + s_rect.height)) / 2;
-        int miny, maxy;
-
- 
-        if (s_rect.GetMidy() > f_rect.GetMidy())
-        {
-            miny = f_rect.GetMidy()-1;
-			maxy = s_rect.GetMidy() + 1;
-        }
-        else
-        {
-            maxy = f_rect.GetMidy()+1;
-            miny = s_rect.GetMidy()-1;
-        }
-        for (int j = miny; j < maxy; ++j)
-        {
-            if (EMapGeneratorData::Wall == base_map[midx][j])
-            {
-                if (EMapGeneratorData::Ground == base_map[midx][j - 1] || EMapGeneratorData::Ground == base_map[midx][j + 1])
-                {
-                    base_map[midx][j] = EMapGeneratorData::Door;
-                }
-                else
-                {
-                    base_map[midx][j] = EMapGeneratorData::Passage;
-                }
-            }
-        }
-        return true;
-    }
-    // y 축(가로)가 공통인지 확인
-    else if ((f_rect.y <= s_rect.y && s_rect.y < f_rect.y + f_rect.width) || (f_rect.y > s_rect.y && s_rect.y + s_rect.width > f_rect.y))
-    {
-        int midy = (std::max(f_rect.y, s_rect.y) + std::min(f_rect.y + f_rect.width, s_rect.y + s_rect.width)) / 2;
-        int minx, maxx;
-
-
-        if (s_rect.GetMidx() > f_rect.GetMidx())
-        {
-			minx = f_rect.GetMidx() - 1;
-			maxx = s_rect.GetMidx() + 1;
-        }
-        else
-        {
-			maxx = f_rect.GetMidx() + 1;
-			minx = s_rect.GetMidx() - 1;
-        }
-        for (int j = minx; j < maxx; ++j)
-        {
-            if (EMapGeneratorData::Wall == base_map[j][midy])
-            {
-				if (EMapGeneratorData::Ground == base_map[j - 1][midy] || EMapGeneratorData::Ground == base_map[j + 1][midy])
-                {
-                    base_map[j][midy] = EMapGeneratorData::Door;
-                }
-                else
-                {
-                    base_map[j][midy] = EMapGeneratorData::Passage;
-                }
-            }
-        }
-        return true;
-    }
-    else
-    {
-        int a = 0;
-        return false;
-        // err
-    }
-}
+//
+//bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)
+//{
+//    // x축(세로)가 공통인지 확인
+//    if ((f_rect.x <= s_rect.x && s_rect.x < f_rect.x + f_rect.height) || (f_rect.x >= s_rect.x && s_rect.x + s_rect.height > f_rect.x))
+//    {
+//
+//        int midx = (std::max(f_rect.x, s_rect.x) + std::min(f_rect.x + f_rect.height, s_rect.x + s_rect.height)) / 2;
+//        int miny, maxy;
+//
+// 
+//        if (s_rect.GetMidy() > f_rect.GetMidy())
+//        {
+//            miny = f_rect.GetMidy()-1;
+//			maxy = s_rect.GetMidy() + 1;
+//        }
+//        else
+//        {
+//            maxy = f_rect.GetMidy()+1;
+//            miny = s_rect.GetMidy()-1;
+//        }
+//        for (int j = miny; j < maxy; ++j)
+//        {
+//            if (EMapGeneratorData::Wall == base_map[midx][j])
+//            {
+//                if (EMapGeneratorData::Ground == base_map[midx][j - 1] || EMapGeneratorData::Ground == base_map[midx][j + 1])
+//                {
+//                    base_map[midx][j] = EMapGeneratorData::Door;
+//                }
+//                else
+//                {
+//                    base_map[midx][j] = EMapGeneratorData::Passage;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+//    // y 축(가로)가 공통인지 확인
+//    else if ((f_rect.y <= s_rect.y && s_rect.y < f_rect.y + f_rect.width) || (f_rect.y > s_rect.y && s_rect.y + s_rect.width > f_rect.y))
+//    {
+//        int midy = (std::max(f_rect.y, s_rect.y) + std::min(f_rect.y + f_rect.width, s_rect.y + s_rect.width)) / 2;
+//        int minx, maxx;
+//
+//
+//        if (s_rect.GetMidx() > f_rect.GetMidx())
+//        {
+//			minx = f_rect.GetMidx() - 1;
+//			maxx = s_rect.GetMidx() + 1;
+//        }
+//        else
+//        {
+//			maxx = f_rect.GetMidx() + 1;
+//			minx = s_rect.GetMidx() - 1;
+//        }
+//        for (int j = minx; j < maxx; ++j)
+//        {
+//            if (EMapGeneratorData::Wall == base_map[j][midy])
+//            {
+//				if (EMapGeneratorData::Ground == base_map[j - 1][midy] || EMapGeneratorData::Ground == base_map[j + 1][midy])
+//                {
+//                    base_map[j][midy] = EMapGeneratorData::Door;
+//                }
+//                else
+//                {
+//                    base_map[j][midy] = EMapGeneratorData::Passage;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+//    else
+//    {
+//        int a = 0;
+//        return false;
+//        // err
+//    }
+//}
 
 
 void URectRoomMapGenerator::CreateRoom(Node* _leafNode)

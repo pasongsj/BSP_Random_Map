@@ -21,41 +21,41 @@ void URectMapGenerator::Init()
 
 
 
-void URectMapGenerator::SetWallBFS(int x, int y)
-{
-    // bfs를 이용하여 맵이 없는 부분 주변을 벽으로 막는다.
-    std::queue<std::pair<int, int>> dfsq;
-    dfsq.push(std::make_pair(x, y));
-    is_visited[x][y] = true;
-    const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
-    const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
-
-    while (!dfsq.empty())
-    {
-        int cx, cy;
-        std::tie(cx, cy) = dfsq.front();
-        dfsq.pop();
-
-        for (int i = 0; i < 8; ++i)
-        {
-            int nx = cx + dx[i];
-            int ny = cy + dy[i];
-            if (true == In_range(nx, ny))
-            {
-                if (EMapGeneratorData::Ground == base_map[nx][ny])
-                {
-                    base_map[nx][ny] = EMapGeneratorData::Wall;
-                }
-                else if (EMapGeneratorData ::VoidTile == base_map[nx][ny] && false == is_visited[nx][ny])
-                {
-                    dfsq.push(std::make_pair(nx, ny));
-                    is_visited[nx][ny] = true;
-                }
-            }
-        }
-
-    }
-}
+//void URectMapGenerator::SetWallBFS(int x, int y)
+//{
+//    // bfs를 이용하여 맵이 없는 부분 주변을 벽으로 막는다.
+//    std::queue<std::pair<int, int>> dfsq;
+//    dfsq.push(std::make_pair(x, y));
+//    is_visited[x][y] = true;
+//    const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
+//    const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
+//
+//    while (!dfsq.empty())
+//    {
+//        int cx, cy;
+//        std::tie(cx, cy) = dfsq.front();
+//        dfsq.pop();
+//
+//        for (int i = 0; i < 8; ++i)
+//        {
+//            int nx = cx + dx[i];
+//            int ny = cy + dy[i];
+//            if (true == In_range(nx, ny))
+//            {
+//                if (EMapGeneratorData::Ground == base_map[nx][ny])
+//                {
+//                    base_map[nx][ny] = EMapGeneratorData::Wall;
+//                }
+//                else if (EMapGeneratorData ::VoidTile == base_map[nx][ny] && false == is_visited[nx][ny])
+//                {
+//                    dfsq.push(std::make_pair(nx, ny));
+//                    is_visited[nx][ny] = true;
+//                }
+//            }
+//        }
+//
+//    }
+//}
 
 
 void URectMapGenerator::CalMapSizeIndex()

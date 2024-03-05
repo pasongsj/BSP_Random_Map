@@ -9,86 +9,160 @@ URectWallMapGenerator::~URectWallMapGenerator()
 {
 }
 
-//
-//bool URectWallMapGenerator::CreateMap()
-//{
-//	URectMapGenerator::CreateMap();
-//
-//
-//    float ratio = static_cast<float>(GetRoomSize({ 1, 1, lx - 1, ly - 1 })) / ((min_room_size + 1) * 2 * room_cnt);
-//
-//    // spare을 늘려가며 가능한 랜덤맵이 있는지 확인한다.
-//    while (true)
-//    {
-//        // 테스트할 맵을 복사한다
-//        CpyMap();
-//
-//        // 방 크기의 여유 비율
-//        float _rate = ratio * spare + 0.1f < 1.0f ? 1.0f : ratio * spare + 0.1f;
-//
-//        // 맵 생성
-//        if (nullptr == RootNode)
-//        {
-//            RootNode = new Node();
-//            RootNode->nodeRect = { 1, 1, lx - 1, ly - 1 }; // 맵의 테두리를 제외한 크기의 루트노드
-//        }
-//        bool can_gen = DivideNode(RootNode, room_cnt, min_room_size, _rate);
-//
-//        if (true == can_gen) // 랜덤맵 생성 성공
-//        {
-//            break;
-//        }
-//        else
-//        {
-//            // 노드 release
-//            ReleaseNode(RootNode);
-//            RootNode = nullptr;
-//            spare += 0.01f;
-//            if (spare >= 1.0f) // 랜덤맵 생성 실패
-//            {
-//                printf("err");
-//                return false;
-//            }
-//        }
-//    }
-//
-//
-//    for (int i = 0; i < lx; ++i) // 랜덤맵 생성을 성공한 경우 cpy
-//    {
-//        for (int j = 0; j < ly; ++j)
-//        {
-//            base_map[i][j] = try_map_gen[i][j];
-//        }
-//    }
-//
-//
-//    // -- test --
-//
-//
-//    // 노드 release
-//    ReleaseNode(RootNode);
-//    RootNode = nullptr;
-//
-//    return true;
-//
-//}
+
+bool URectWallMapGenerator::CreateMap()
+{
+	URectMapGenerator::CreateMap();
 
 
-//bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
-//{
-//    base_map = _map;
-//
-//    lx = static_cast<int>(_map.size());
-//    ly = static_cast<int>(_map[0].size());
-//
-//    room_cnt = _roomcnt;
-//    min_room_size = _min_room_size;
-//    door_size = _doorsize;
-//
-//    spare = 0.8f;
-//    return URectWallMapGenerator::CreateMap();
-//}
-//
+    switch (CurMapShape)
+    {
+    case MapShape::none:
+        break;
+    case MapShape::giyeok:
+    case MapShape::digeut:
+    case MapShape::mieum:
+    {
+        for (int i = 0; i < ShapeList.size() - 1; ++i)
+        {
+            MakeDoor(ShapeList[i], ShapeList[i + 1]);
+        }
+        break;
+    }
+    case MapShape::cross:
+    {
+
+        for (int i = 1; i < ShapeList.size(); ++i)
+        {
+            MakeDoor(ShapeList[0], ShapeList[i]);
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    // spare을 늘려가며 가능한 랜덤맵이 있는지 확인한다.
+    while (true)
+    {
+        // 테스트할 맵을 복사한다
+        CpyMap();
+
+
+        // 맵 생성
+
+        bool can_gen = true;
+        if (CurMapShape == MapShape::none)
+        {
+            // 방 크기의 여유 비율
+            float ratio = static_cast<float>(GetRoomSize({ 1, 1, lx - 2, ly - 2 })) / ((min_room_size + 1) * 2 * room_cnt);
+            float _rate = ratio * spare + 0.1f < 1.0f ? 1.0f : ratio * spare + 0.1f;
+
+            if (nullptr == RootNode)
+            {
+                RootNode = new Node();
+                RootNode->nodeRect = { 1, 1, lx - 1, ly - 1 }; // 맵의 테두리를 제외한 크기의 루트노드
+            }
+            can_gen = DivideNode(RootNode, room_cnt, min_room_size, _rate);
+        }
+        else
+        {
+
+            int remain_room = room_cnt % ShapeList.size();
+            for (Node* Roots : ShapeList)
+            {
+                // 방 크기의 여유 비율
+                float ratio = static_cast<float>(GetRoomSize(Roots->nodeRect)) / ((min_room_size + 1) * 2 * (room_cnt / ShapeList.size() + 1));
+                float _rate = ratio * spare + 0.1f < 1.0f ? 1.0f : ratio * spare + 0.1f;
+
+                if (remain_room > 0)
+                {
+                    can_gen = can_gen && DivideNode(Roots, room_cnt / static_cast<int>(ShapeList.size()) + 1, min_room_size, _rate);
+                    remain_room--;
+                }
+                else
+                {
+                    can_gen = can_gen && DivideNode(Roots, room_cnt / static_cast<int>(ShapeList.size()), min_room_size, _rate);
+                }
+            }
+        }
+
+
+        if (true == can_gen) // 랜덤맵 생성 성공
+        {
+            break;
+        }
+        else
+        {
+            // 노드 release
+            LeafNodeList.clear();
+            if (CurMapShape == MapShape::none)
+            {
+                ReleaseNode(RootNode);
+                RootNode = nullptr;
+            }
+            else
+            {
+                for (Node* Roots : ShapeList)
+                {
+                    ReleaseNode(Roots->rightNode);
+                    Roots->rightNode = nullptr;
+                    ReleaseNode(Roots->leftNode);
+                    Roots->leftNode = nullptr;
+                }
+            }
+            spare += 0.01f;
+            if (spare >= 1.0f) // 랜덤맵 생성 실패
+            {
+                printf("err");
+                return false;
+            }
+        }
+    }
+
+    for (int i = 0; i < lx; ++i) // 랜덤맵 생성을 성공한 경우 cpy
+    {
+        for (int j = 0; j < ly; ++j)
+        {
+            base_map[i][j] = try_map_gen[i][j];
+        }
+    }
+
+
+    // -- test --
+
+
+    // 노드 release
+    LeafNodeList.clear();
+    ReleaseNode(RootNode);
+    for (Node* _node : ShapeList)
+    {
+        ReleaseNode(_node);
+    }
+    RootNode = nullptr;
+
+    return true;
+
+}
+
+
+bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape )
+{
+    base_map = _map;
+
+    lx = static_cast<int>(_map.size());
+    ly = static_cast<int>(_map[0].size());
+
+    room_cnt = _roomcnt;
+    min_room_size = _min_room_size;
+    door_size = _doorsize;
+
+    spare = 0.8f;
+    CurMapShape = _Shape;
+
+    return URectWallMapGenerator::CreateMap();
+}
+
 
 // 현재 Node를 n개로 나누고싶다는 의미
 bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
@@ -243,6 +317,51 @@ bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
     return DivideNode(tree->leftNode, leftnodecnt, _size, nrate) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
 
 }
+
+bool URectWallMapGenerator::MakeDoor(Node* _fnode, Node* _snode)
+{
+    if (_fnode->nodeRect.x == _snode->nodeRect.x)
+    {
+        RectInt fRect = _fnode->nodeRect.y > _snode->nodeRect.y ? _snode->nodeRect : _fnode->nodeRect;
+        RectInt sRect = _fnode->nodeRect.y < _snode->nodeRect.y ? _snode->nodeRect : _fnode->nodeRect;
+
+        int mid = fRect.x + fRect.height / 2;
+        int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - fRect.height / 4, mid + fRect.height / 4);
+
+        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
+        {
+			if (EMapGeneratorData::Wall == base_map[i][fRect.y + fRect.width ])
+            {
+				base_map[i][fRect.y + fRect.width] = EMapGeneratorData::Door;
+            }
+        }
+        return true;
+    }
+    else if (_fnode->nodeRect.y == _snode->nodeRect.y)
+    {
+
+        RectInt fRect = _fnode->nodeRect.x > _snode->nodeRect.x ? _snode->nodeRect : _fnode->nodeRect;
+        RectInt sRect = _fnode->nodeRect.x < _snode->nodeRect.x ? _snode->nodeRect : _fnode->nodeRect;
+
+        int mid = fRect.y + fRect.width / 2;
+        int doorPos = GameEngineRandom::MainRandom.RandomInt(mid - fRect.width / 4, mid + fRect.width / 4);
+
+        for (int i = doorPos - door_size / 2; i < doorPos + door_size / 2 + (door_size & 1); ++i)
+        {
+			if (EMapGeneratorData::Wall == base_map[fRect.x + fRect.height][i])
+            {
+				base_map[fRect.x + fRect.height][i] = EMapGeneratorData::Door;
+            }
+        }
+        return true;
+
+    }
+    else
+    {
+        return false;
+    }
+}
+
 
 //자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
 void URectWallMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
