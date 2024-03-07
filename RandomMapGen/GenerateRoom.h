@@ -42,7 +42,7 @@ private:
 	// 노드 작업 - 노드 제작
 	//
 	// x,y가 현재 map size 인덱스 내에 있는지 확인하는 작업
-	bool In_range(int x, int y);
+	bool InRange(int x, int y);
 
 	// 현재 Node를 n개로 나누고싶다는 의미
 	bool DivideNode(std::shared_ptr<Node> tree, int n, int _size, float _rate, MapType _Type);

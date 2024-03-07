@@ -4,6 +4,8 @@
 
 #include "URectWallMapGenerator.h"
 #include "URectRoomMapGenerator.h"
+#include "URectCaveMapGenerator.h"
+
 
 int main()
 {
@@ -52,8 +54,8 @@ int main()
 
 	//URectMapGenerator(std::vector<std::vector<int>> _map, int _roomcnt, int _min_room_size, int _doorsize)
 
-	URectMapGenerator* NewMap = new URectWallMapGenerator();
-	if (true == NewMap->CreateMap(Map,16, 3, 1, MapShape::giyeok))
+	URectMapGenerator* NewMap = new URectCaveMapGenerator();
+	if (true == NewMap->CreateMap(Map,16, 3, 1, MapShape::none))
 	{
 		NewMap->Print();
 	}

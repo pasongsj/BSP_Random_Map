@@ -114,7 +114,7 @@ void URectMapGenerator::ReleaseNode(Node* _cNode)
 }
 
 
-bool URectMapGenerator::In_range(int x, int y)
+bool URectMapGenerator::InRange(int x, int y)
 {
     return 0 < x && x < lx - 1 && 0 < y && y < ly - 1;
 }
@@ -351,7 +351,7 @@ bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _m
 
 void URectMapGenerator::Print()
 {
-    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"땅"},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "통"}};
+    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"□ "},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "통"}};
         for (int i = 0; i < base_map.size(); ++i)
         {
             for (int j = 0; j < base_map[0].size(); ++j)

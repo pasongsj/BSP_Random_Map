@@ -1,7 +1,7 @@
 #pragma once
 #include "URectMapGenerator.h"
 
-// 설명 :
+// 설명 : ref https://www.roguebasin.com/index.php?title=Basic_BSP_Dungeon_generation
 class URectWallMapGenerator : public URectMapGenerator
 {
 public:

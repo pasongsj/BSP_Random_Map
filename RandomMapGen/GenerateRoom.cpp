@@ -86,7 +86,7 @@ void GenerateRoom::CpyMap(const std::vector<std::vector<int>>& _Map)
 }
 
 
-bool GenerateRoom::In_range(int x, int y)
+bool GenerateRoom::InRange(int x, int y)
 {
     return 0 < x && x < lx-1 && 0 < y && y < ly-1;
 }
@@ -116,7 +116,7 @@ void GenerateRoom::SetWallBFS(int x, int y, std::vector<std::vector<int>>& Map)
         {
             int nx = cx + dx[i];
             int ny = cy + dy[i];
-            if (true == In_range(nx, ny))
+            if (true == InRange(nx, ny))
             {
                 if (0 == Map[nx][ny])
                 {

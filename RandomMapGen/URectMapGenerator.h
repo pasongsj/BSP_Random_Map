@@ -68,13 +68,13 @@ protected:
 	// 노드 작업 - 노드 제작
 //
 // x,y가 현재 map size 인덱스 내에 있는지 확인하는 작업
-	bool In_range(int x, int y);
+	bool InRange(int x, int y);
 
 	// 현재 Node를 n개로 나누고싶다는 의미
-	virtual bool DivideNode(Node* tree, int n, int _size, float _rate) = 0;
+	virtual bool DivideNode(Node* tree, int n, int _size, float _rate) { return true; };
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-	virtual void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) = 0;
+	virtual void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) {};
 
 	// 현재 Rect를 나누어 Left와 Right노드의 크기를 가져올 수 있도록 함
 	void GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right);
