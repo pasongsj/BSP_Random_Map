@@ -297,27 +297,7 @@ bool URectMapGenerator::CreateMap()
 {
     Init();
     SettingMapShap();
-    // 맵이 없는 부분(-1)확인,
-    //for (int i = 0; i < lx; ++i)
-    //{
-    //    for (int j = 0; j < ly; ++j)
-    //    {
-    //        if (true == is_visited[i][j])
-    //        {
-    //            continue;
-    //        }
 
-    //        if (EMapGeneratorData::VoidTile == base_map[i][j])// -1인 부분이 있다면 BFS를 통해 주변에 벽을 세움
-    //        {
-    //            SetWallBFS(i, j);
-    //        }
-    //        else if (EMapGeneratorData::Ground == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1)) // 테두리부분에도 벽을 세움
-    //        {
-    //            base_map[i][j] = EMapGeneratorData::Wall;
-    //        }
-    //        is_visited[i][j] = true;
-    //    }
-    //}
 
     //// 맵 크기를 빠르게 계산하기 위함
     CalMapSizeIndex();

@@ -12,22 +12,22 @@ bool URectCaveMapGenerator::CreateMap()
 {
     URectMapGenerator::CreateMap();
 
-    //CpyMap();
+    CpyMap();
 
     Setting();
-
-    for (int i = 0; i < 5; ++i)
+    for (int i = 0; i < 4; ++i)
     {
         ApplyRules();
     }
-    //for (int i = 0; i < lx; ++i) // 랜덤맵 생성을 성공한 경우 cpy
-    //{
-    //    for (int j = 0; j < ly; ++j)
-    //    {
-    //        base_map[i][j] = try_map_gen[i][j];
-    //    }
-    //}
 
+
+    for (int i = 0; i < lx; ++i)
+    {
+        for (int j = 0; j < ly; ++j)
+        {
+            base_map[i][j] = try_map_gen[i][j];
+        }
+    }
 
     // 노드 release
     LeafNodeList.clear();
@@ -62,25 +62,38 @@ bool URectCaveMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
 
 void URectCaveMapGenerator::ApplyRules()
 {
-    CpyMap();
+    iter_map.resize(lx);
+    for (int i = 0; i < lx; ++i)
+    {
+        iter_map[i].resize(ly);
+        for (int j = 0; j < ly; ++j)
+        {
+            iter_map[i][j] = try_map_gen[i][j];
+        }
+    }
+
     const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
     const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
     for (int i = 0; i < lx; ++i)
     {
         for (int j = 0; j < ly; ++j)
         {
+            if (EMapGeneratorData::VoidTile == try_map_gen[i][j])
+            {
+                continue;   
+            }
             int wallcnt = 0;
             for (int k = 0; k < 8; ++k)
             {
                 int nx = i + dx[k], ny = j + dy[k];
-                
+
                 if (true == InRange(nx, ny))
                 {
-                    if (EMapGeneratorData::Wall == base_map[nx][ny])
+                    if (EMapGeneratorData::Wall == try_map_gen[nx][ny])
                     {
                         wallcnt++;
                     }
-                    else if (EMapGeneratorData::VoidTile == base_map[nx][ny])
+                    else if (EMapGeneratorData::VoidTile == try_map_gen[nx][ny])
                     {
                         wallcnt = 10;
                         break;
@@ -95,19 +108,19 @@ void URectCaveMapGenerator::ApplyRules()
             }
             if (wallcnt < 4)
             {
-                try_map_gen[i][j] = EMapGeneratorData::Ground;
+                iter_map[i][j] = EMapGeneratorData::Ground;
             }
             else
             {
-                try_map_gen[i][j] = EMapGeneratorData::Wall;
+                iter_map[i][j] = EMapGeneratorData::Wall;
             }
         }
     }
-    for (int i = 0; i < lx; ++i) 
+    for (int i = 0; i < lx; ++i)
     {
         for (int j = 0; j < ly; ++j)
         {
-            base_map[i][j] = try_map_gen[i][j];
+            try_map_gen[i][j] = iter_map[i][j];
         }
     }
 }
@@ -116,17 +129,38 @@ void URectCaveMapGenerator::ApplyRules()
 
 void URectCaveMapGenerator::Setting()
 {
-    for (int i = 0; i < lx; ++i)
+    const int dx[8] = { 0,  0,  1, -1 , -1, -1,  1,  1 };
+    const int dy[8] = { 1, -1,  0,  0 , -1,  1, -1,  1 };
+
+    for (int i = 1; i < lx-1; ++i)
     {
-        for (int j = 0; j < ly; ++j)
+        for (int j = 1; j < ly-1; ++j)
         {
-            if (EMapGeneratorData::Ground == base_map[i][j])
+            if (EMapGeneratorData::VoidTile == try_map_gen[i][j])
             {
-                if (0 == GameEngineRandom::MainRandom.RandomInt(0, 2))
+                continue;
+            }
+
+            bool is_def = false;
+            for (int k = 0; k < 8; ++k)
+            {
+                int nx = i + dx[k], ny = j + dy[k];
+
+				if (!(0 <= nx && nx < lx && 0 <= ny && ny < ly) || EMapGeneratorData::VoidTile == try_map_gen[nx][ny])
                 {
-					base_map[i][j] = EMapGeneratorData::Wall;
+                    is_def = true;
+                    break;
                 }
             }
+            if (true == is_def || 0 == GameEngineRandom::MainRandom.RandomInt(0, 2))
+            {
+                try_map_gen[i][j] = EMapGeneratorData::Wall;
+            }
+            else
+            {
+                try_map_gen[i][j] = EMapGeneratorData::Ground;
+            }
+
         }
     }
 }

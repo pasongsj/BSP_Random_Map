@@ -60,6 +60,8 @@ private:
 
 	void Setting();
 	void ApplyRules();
+	std::vector<std::vector<EMapGeneratorData>>	iter_map;			// 랜덤맵 생성 가능여부를 테스트하기 위함
+
 
 };
 
