@@ -62,11 +62,13 @@ protected:
 	bool DivideNode(Node* tree, int n, int _size, float _rate) override;
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-	void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) override;
+	bool DrawLine(const RectInt& _cur, int splite, bool is_height, int n) override;
 
 	bool MakeDoor(Node* _fnode, Node* _snode);
 
 private:
+
+	bool TryDiv();
 
 };
 

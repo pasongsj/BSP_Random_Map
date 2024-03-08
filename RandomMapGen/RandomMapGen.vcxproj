@@ -20,12 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameEngineRandom.h" />
-    <ClInclude Include="GenerateRoom.h">
-      <SubType>
-      </SubType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
     <ClInclude Include="Node.h">
       <SubType>
       </SubType>
@@ -53,12 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameEngineRandom.cpp" />
-    <ClCompile Include="GenerateRoom.cpp">
-      <SubType>
-      </SubType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp">
       <SubType>

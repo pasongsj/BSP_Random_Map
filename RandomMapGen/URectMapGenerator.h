@@ -74,7 +74,7 @@ protected:
 	virtual bool DivideNode(Node* tree, int n, int _size, float _rate) { return true; };
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-	virtual void DrawLine(const RectInt& _cur, int splite, bool is_height, int n) {};
+	virtual bool DrawLine(const RectInt& _cur, int splite, bool is_height, int n) { return true; };
 
 	// 현재 Rect를 나누어 Left와 Right노드의 크기를 가져올 수 있도록 함
 	void GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right);
@@ -88,7 +88,7 @@ protected:
 	void Init();
 
 	// 땅이 없는 부분(-1)의 테두리에 벽을 세우는 함수
-	//void SetWallBFS(int x, int y);
+	void SetWallBFS(int x, int y);
 
 	// 해당 인덱스까지 모든 넓이의 합을 dp로 구함
 	void CalMapSizeIndex();

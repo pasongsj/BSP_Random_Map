@@ -299,21 +299,21 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
     int leftSize = GetRoomSize(LeftRect);
     int rightSize = GetRoomSize(RightRect);
 
-    //// 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
-    //if (leftSize == 0)
-    //{
-    //    tree->rightNode = new Node();
-    //    tree->rightNode->nodeRect = RightRect;
-    //    tree->rightNode->parNode = tree;
-    //    return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    //}
-    //else if (rightSize == 0)
-    //{
-    //    tree->leftNode = new Node();
-    //    tree->leftNode->nodeRect = LeftRect;
-    //    tree->leftNode->parNode = tree;
-    //    return DivideNode(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    //}
+    // 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
+    if (leftSize == 0)
+    {
+        tree->rightNode = new Node();
+        tree->rightNode->nodeRect = RightRect;
+        tree->rightNode->parNode = tree;
+        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    }
+    else if (rightSize == 0)
+    {
+        tree->leftNode = new Node();
+        tree->leftNode->nodeRect = LeftRect;
+        tree->leftNode->parNode = tree;
+        return DivideNode(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+    }
 
 
     // 홀수개의 방을 만들어야하는 경우 1 : 2 크기 비율로 split를 계산하기 위함
@@ -564,7 +564,7 @@ bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
 }
 
 //자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
+bool URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_height, int n)
 {
     if (is_height)
     {
@@ -592,6 +592,7 @@ void URectRoomMapGenerator::DrawLine(const RectInt& _cur, int splite, bool is_he
             }
         }
     }
+    return true;
 }
 //
 //bool URectRoomMapGenerator::MakeRoad(const RectInt f_rect, const RectInt s_rect)

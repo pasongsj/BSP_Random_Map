@@ -21,41 +21,41 @@ void URectMapGenerator::Init()
 
 
 
-//void URectMapGenerator::SetWallBFS(int x, int y)
-//{
-//    // bfs를 이용하여 맵이 없는 부분 주변을 벽으로 막는다.
-//    std::queue<std::pair<int, int>> dfsq;
-//    dfsq.push(std::make_pair(x, y));
-//    is_visited[x][y] = true;
-//    const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
-//    const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
-//
-//    while (!dfsq.empty())
-//    {
-//        int cx, cy;
-//        std::tie(cx, cy) = dfsq.front();
-//        dfsq.pop();
-//
-//        for (int i = 0; i < 8; ++i)
-//        {
-//            int nx = cx + dx[i];
-//            int ny = cy + dy[i];
-//            if (true == In_range(nx, ny))
-//            {
-//                if (EMapGeneratorData::Ground == base_map[nx][ny])
-//                {
-//                    base_map[nx][ny] = EMapGeneratorData::Wall;
-//                }
-//                else if (EMapGeneratorData ::VoidTile == base_map[nx][ny] && false == is_visited[nx][ny])
-//                {
-//                    dfsq.push(std::make_pair(nx, ny));
-//                    is_visited[nx][ny] = true;
-//                }
-//            }
-//        }
-//
-//    }
-//}
+void URectMapGenerator::SetWallBFS(int x, int y)
+{
+    // bfs를 이용하여 맵이 없는 부분 주변을 벽으로 막는다.
+    std::queue<std::pair<int, int>> dfsq;
+    dfsq.push(std::make_pair(x, y));
+    is_visited[x][y] = true;
+    const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
+    const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
+
+    while (!dfsq.empty())
+    {
+        int cx, cy;
+        std::tie(cx, cy) = dfsq.front();
+        dfsq.pop();
+
+        for (int i = 0; i < 8; ++i)
+        {
+            int nx = cx + dx[i];
+            int ny = cy + dy[i];
+            if (true == InRange(nx, ny))
+            {
+                if (EMapGeneratorData::Ground == base_map[nx][ny])
+                {
+                    base_map[nx][ny] = EMapGeneratorData::Wall;
+                }
+                else if (EMapGeneratorData ::VoidTile == base_map[nx][ny] && false == is_visited[nx][ny])
+                {
+                    dfsq.push(std::make_pair(nx, ny));
+                    is_visited[nx][ny] = true;
+                }
+            }
+        }
+
+    }
+}
 
 
 void URectMapGenerator::CalMapSizeIndex()
@@ -116,7 +116,7 @@ void URectMapGenerator::ReleaseNode(Node* _cNode)
 
 bool URectMapGenerator::InRange(int x, int y)
 {
-    return 0 < x && x < lx - 1 && 0 < y && y < ly - 1;
+    return 0 < x && x < lx  && 0 < y && y < ly;
 }
 
 void URectMapGenerator::GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right)
@@ -177,28 +177,42 @@ void URectMapGenerator::DrawRect(RectInt& _CurRect)
 
 void URectMapGenerator::SettingMapShap()
 {
-    if (MapShape::none == CurMapShape)
+    switch (CurMapShape)
     {
-        RectInt holeRect = { 0,0,lx - 1,ly - 1 };
-        DrawRect(holeRect);
-        return;
+    case MapShape::none:
+    {
+        for (int i = 0; i < lx; ++i)
+        {
+            for (int j = 0; j < ly; ++j)
+            {
+                if (false == is_visited[i][j] && EMapGeneratorData::VoidTile == base_map[i][j])
+                {
+                    SetWallBFS(i, j);
+                }
+                else if (EMapGeneratorData::Ground == base_map[i][j] && (i == 0 || i == lx - 1 || j == 0 || j == ly - 1))
+                {
+                    base_map[i][j] = EMapGeneratorData::Wall;
+                }
+            }
+        }
+        break;
     }
-    else if (MapShape::giyeok == CurMapShape)
+    case MapShape::giyeok:
     {
-		int split_x[3] = { 0, 0,lx - 1 };
-		int split_y[3] = { 0, 0,ly - 1 };
+        int split_x[3] = { 0, 0,lx - 1 };
+        int split_y[3] = { 0, 0,ly - 1 };
         split_x[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx / 2));
 
         split_y[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (ly / 2));
 
-		std::vector<RectInt> allRect;
-		allRect.push_back({ split_x[0],split_y[0],split_x[1] - split_x[0],split_y[1] - split_y[0] });
+        std::vector<RectInt> allRect;
+        allRect.push_back({ split_x[0],split_y[0],split_x[1] - split_x[0],split_y[1] - split_y[0] });
 
-		allRect.push_back({ split_x[0],split_y[1],split_x[1] - split_x[0],split_y[2] - split_y[1] });
+        allRect.push_back({ split_x[0],split_y[1],split_x[1] - split_x[0],split_y[2] - split_y[1] });
 
-		allRect.push_back({ split_x[1],split_y[1],split_x[2] - split_x[1],split_y[2] - split_y[1] });
+        allRect.push_back({ split_x[1],split_y[1],split_x[2] - split_x[1],split_y[2] - split_y[1] });
 
-		allRect.push_back({ split_x[1],split_y[0],split_x[2] - split_x[1],split_y[1] - split_y[0] });
+        allRect.push_back({ split_x[1],split_y[0],split_x[2] - split_x[1],split_y[1] - split_y[0] });
 
         int RemovePos = GameEngineRandom::MainRandom.RandomInt(0, 3);
 
@@ -211,11 +225,14 @@ void URectMapGenerator::SettingMapShap()
             curNode->nodeRect = allRect[(RemovePos + i) % 4];
             ShapeList.push_back(curNode);
         }
+        break;
     }
-    else
+    case MapShape::digeut:
+    case MapShape::mieum:
+    case MapShape::cross:
     {
-        int split_x[4] = { 0, 0,0,lx-1 };
-        int split_y[4] = { 0, 0,0,ly-1 };
+        int split_x[4] = { 0, 0,0,lx - 1 };
+        int split_y[4] = { 0, 0,0,ly - 1 };
         split_x[1] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx / 3));
         split_x[2] = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (lx * 2 / 3));
 
@@ -227,23 +244,23 @@ void URectMapGenerator::SettingMapShap()
         {
             for (int j = 0; j < 3; ++j)
             {
-                allRect.push_back({ split_x[i],split_y[j],split_x[i + 1] - split_x[i],split_y[j + 1] - split_y[j]});
+                allRect.push_back({ split_x[i],split_y[j],split_x[i + 1] - split_x[i],split_y[j + 1] - split_y[j] });
             }
         }
 
-		int pos[8] = { 1,2,5,8,7,6,3,0 };
+        int pos[8] = { 1,2,5,8,7,6,3,0 };
         switch (CurMapShape)
         {
         case MapShape::digeut:
         {
-			int RemovePos = GameEngineRandom::MainRandom.RandomInt(0, 3) * 2;
+            int RemovePos = GameEngineRandom::MainRandom.RandomInt(0, 3) * 2;
 
             RemoveRect(allRect[pos[RemovePos]]);
             RemoveRect(allRect[4]);
             for (int i = 1; i < 8; ++i)
             {
                 Node* curNode = new Node();
-				DrawRect(allRect[pos[(i + RemovePos) % 8]]);
+                DrawRect(allRect[pos[(i + RemovePos) % 8]]);
                 curNode->nodeRect = allRect[pos[(i + RemovePos) % 8]];
                 ShapeList.push_back(curNode);
             }
@@ -287,9 +304,11 @@ void URectMapGenerator::SettingMapShap()
         default:
             break;
         }
+        break;
     }
-	
-
+    default:
+        break;
+    }
 }
 
 
