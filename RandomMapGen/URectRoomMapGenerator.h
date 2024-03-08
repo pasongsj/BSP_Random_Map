@@ -49,7 +49,6 @@ public:
 	URectRoomMapGenerator& operator=(URectRoomMapGenerator&& _Other) noexcept = delete;
 
 	bool CreateMap() override;
-	//bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize) override;
 	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
 
 
@@ -68,7 +67,7 @@ protected:
 private:
 
 	void CreateRoom(Node* _leafNode);
-	bool ConnectRoom(Node* main_node, Node* sub_node = nullptr);
+	void ConnectRoom(Node* main_node, Node* sub_node = nullptr);
 
 };
 

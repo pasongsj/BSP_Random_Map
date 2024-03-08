@@ -57,7 +57,7 @@ bool URectWallMapGenerator::CreateMap()
 {
 	URectMapGenerator::CreateMap();
 
-
+    // °ø°£ ¿¬°áÇÏ±â
     switch (CurMapShape)
     {
     case MapShape::none:
@@ -86,6 +86,7 @@ bool URectWallMapGenerator::CreateMap()
     }
 
     // spareÀ» ´Ã·Á°¡¸ç °¡´ÉÇÑ ·£´ý¸ÊÀÌ ÀÖ´ÂÁö È®ÀÎÇÑ´Ù.
+    // ·£´ý¸Ê Æ®¶óÀÌ
     while (true)
     {
         // ¸Ê »ý¼º
@@ -95,15 +96,7 @@ bool URectWallMapGenerator::CreateMap()
 		{
 			m_rate = 0.2f;
 			can_gen = TryDiv();
-			if (true == can_gen)
-			{
-				break;
-			}
-		}
-        if (false == can_gen) // ·£´ý¸Ê »ý¼º ½ÇÆÐ
-        {
-            // ³ëµå release
-            //LeafNodeList.clear();
+
             if (CurMapShape == MapShape::none)
             {
                 ReleaseNode(RootNode);
@@ -119,16 +112,26 @@ bool URectWallMapGenerator::CreateMap()
                     Roots->leftNode = nullptr;
                 }
             }
-            spare += 0.01f;
-            if (spare >= 1.0f) // ·£´ý¸Ê »ý¼º ½ÇÆÐ
-            {
-                printf("err");
-                return false;
-            }
-        }
-        else
+
+			if (true == can_gen)
+			{
+				break;
+			}
+		}
+        spare += 0.01f;
+        if (spare >= 1.0f) // ·£´ý¸Ê »ý¼º ½ÇÆÐ
         {
-            break;
+            printf("err");
+            // ³ëµå release
+            for (Node* _node : ShapeList)
+            {
+                ReleaseNode(_node);
+            }
+            return false;
+        }
+        if (true == can_gen) // ·£´ý¸Ê »ý¼º ½ÇÆÐ
+        {
+			break;
         }
     }
 
@@ -141,17 +144,11 @@ bool URectWallMapGenerator::CreateMap()
     }
 
 
-    // -- test --
-
-
     // ³ëµå release
-    LeafNodeList.clear();
-    ReleaseNode(RootNode);
     for (Node* _node : ShapeList)
     {
         ReleaseNode(_node);
     }
-    RootNode = nullptr;
 
     return true;
 

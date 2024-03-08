@@ -359,4 +359,6 @@ void URectMapGenerator::Print()
             }
             std::cout << '\n';
         }
+        std::cout << '\n';
+
 }
