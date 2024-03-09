@@ -39,7 +39,8 @@ private:
 	void CreateRoom(Node* _leafNode);
 
 	// ¹æ ¿¬°á
-	void ConnectRoom(Node* main_node, Node* sub_node = nullptr);
+	bool ConnectRoom(Node* main_node, Node* sub_node = nullptr);
+
 
 };
 

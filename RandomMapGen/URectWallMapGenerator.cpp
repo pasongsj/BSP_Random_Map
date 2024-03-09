@@ -245,10 +245,10 @@ bool URectWallMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
     }
     else if (rightSize == 0)
     {
-        tree->leftNode = new Node();
-        tree->leftNode->nodeRect = LeftRect;
-        tree->leftNode->parNode = tree;
-        return DivideNode(tree->leftNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        tree->rightNode = new Node();
+        tree->rightNode->nodeRect = LeftRect;
+        tree->rightNode->parNode = tree;
+        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
 
 

@@ -10,22 +10,22 @@
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	std::vector<std::vector<EMapGeneratorData>> Map(30, std::vector< EMapGeneratorData>(30, EMapGeneratorData::Ground));
+	std::vector<std::vector<EMapGeneratorData>> Map(50, std::vector< EMapGeneratorData>(50, EMapGeneratorData::Ground));
 
 	//int* a = new int();
 	// 
 	// 
-	//int rate = 15;
-	//for (int i = 0; i < rate; ++i)
-	//{
-	//	for (int j = 0; j < rate; ++j)
-	//	{
-	//		Map[i][j] = EMapGeneratorData::VoidTile;
-	//		Map[i][Map[0].size()-j-1] = EMapGeneratorData::VoidTile;
-	//		Map[Map.size()-1-i][j] = EMapGeneratorData::VoidTile;
-	//		Map[Map.size()-1-i][Map[0].size() - j - 1] = EMapGeneratorData::VoidTile;
-	//	}
-	//}
+	int rate = 15;
+	for (int i = 0; i < rate; ++i)
+	{
+		for (int j = 0; j < rate; ++j)
+		{
+			Map[i][j] = EMapGeneratorData::VoidTile;
+			Map[i][Map[0].size()-j-1] = EMapGeneratorData::VoidTile;
+			Map[Map.size()-1-i][j] = EMapGeneratorData::VoidTile;
+			Map[Map.size()-1-i][Map[0].size() - j - 1] = EMapGeneratorData::VoidTile;
+		}
+	}
 	//for (int i = 0; i < 10; ++i)
 	//{
 	//	for (int j = 0; j < 10; ++j)

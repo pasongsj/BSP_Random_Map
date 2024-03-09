@@ -329,7 +329,7 @@ bool URectMapGenerator::CreateMap()
 
 void URectMapGenerator::Print()
 {
-    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"бр "},{EMapGeneratorData::Wall, "║о"},{EMapGeneratorData::Door,"╣о"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "┼ы"}};
+    std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"бр"},{EMapGeneratorData::Wall, "бс"},{EMapGeneratorData::Door,"б┌"},{EMapGeneratorData::VoidTile," "},{EMapGeneratorData::Passage, "б┘"}};
         for (int i = 0; i < base_map.size(); ++i)
         {
             for (int j = 0; j < base_map[0].size(); ++j)
