@@ -321,7 +321,7 @@ bool URectMapGenerator::CreateMap()
     //// 맵 크기를 빠르게 계산하기 위함
     CalMapSizeIndex();
 
-    CpyMap();
+    //CpyMap();
 
 
     return true;

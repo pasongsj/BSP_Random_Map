@@ -52,6 +52,7 @@ public:
 
 	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
 
+
 protected:
 
 
@@ -60,6 +61,9 @@ private:
 
 	void Setting();
 	void ApplyRules();
+	bool ValidCheck();
+
+	int GetCaveSize(int x, int y, bool _remove = false);
 	std::vector<std::vector<EMapGeneratorData>>	iter_map;			// 랜덤맵 생성 가능여부를 테스트하기 위함
 
 
