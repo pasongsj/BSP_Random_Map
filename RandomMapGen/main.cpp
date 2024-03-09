@@ -58,8 +58,9 @@ int main()
 	//}
 
 
-	URectMapGenerator* NewMap = new URectCaveMapGenerator();
-	if (true == NewMap->CreateMap(Map,30, 70, 1, MapShape::mieum))
+	URectRoomMapGenerator* NewMap = new URectRoomMapGenerator();
+	NewMap->SetIgnoreRoomType({ URectRoomMapGenerator::RoomType::Circle, URectRoomMapGenerator::RoomType::Rhombus });
+	if (true == NewMap->CreateMap(Map,30, 5, 1, MapShape::mieum))
 	{
 		NewMap->Print();
 	}

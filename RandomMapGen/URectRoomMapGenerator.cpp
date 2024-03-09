@@ -14,7 +14,6 @@ bool URectRoomMapGenerator::CreateMap()
     URectMapGenerator::CreateMap();
 
 
-
     // spare을 늘려가며 가능한 랜덤맵이 있는지 확인한다.
     while (true)
     {
@@ -708,6 +707,16 @@ bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
 
     spare = 0.8f;
     CurMapShape = _Shape;
+
+    const RoomType TypeList[4] = { RoomType::Triangle, RoomType::Rect, RoomType::Rhombus, RoomType::Circle };
+    for (RoomType _Type : TypeList)
+    {
+        if (IgnoreRoomType.end() == IgnoreRoomType.find(_Type))
+        {
+            RoomTypeList.push_back(_Type);
+        }
+    }
+
     return URectRoomMapGenerator::CreateMap();
 }
 
@@ -749,89 +758,35 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
 {
     RectInt CurRect = _leafNode->nodeRect;
 
-    int random_polygon = GameEngineRandom::MainRandom.RandomInt(0, 5);
+    //int random_polygon = GameEngineRandom::MainRandom.RandomInt(0, 5);
+
+
+    RoomType RandomRoomType = RoomTypeList[GameEngineRandom::MainRandom.RandomInt(0, RoomTypeList.size() - 1)];
 
     bool clean_room = false;
     if (CurRect.width < 4 || CurRect.height < 4 || GetRoomSize(_leafNode->nodeRect) != ((CurRect.width) * (CurRect.height)))
     {
-        random_polygon = 6;
+        RandomRoomType = RoomType::None;
+        //random_polygon = 6;
         clean_room = true;
     }
 	const int dx[4] = { 0,0,1,-1 };
 	const int dy[4] = { 1,-1,0,0 };
 
 
-    switch (random_polygon)
+    switch (RandomRoomType)
     {
-    case 0:
-    {
-		{
-			int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width - 1);
-			int b_x = CurRect.x;
-			int b_y = CurRect.y + point_len;
-
-
-			int a_x = CurRect.x + CurRect.height - 1;
-			int a_y = CurRect.y;
-
-			int c_x = CurRect.x + CurRect.height - 1;
-			int c_y = CurRect.y + CurRect.width - 1;
-
-			if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y])
-			{
-                clean_room = true;
-                break;
-			}
-
-			for (int i = CurRect.x-1; i <= CurRect.x + CurRect.height; ++i)
-			{
-				for (int j = CurRect.y-1; j <= CurRect.y + CurRect.width; ++j)
-				{
-                    if (i < c_x && (i * (b_y - a_y) > ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) && (i * (b_y - c_y) < ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
-                    {
-                        base_map[i][j] = EMapGeneratorData::Ground;
-                    }
-                    else
-                    {
-                        if (EMapGeneratorData::Passage == base_map[i][j])
-                        {
-                            for (int k = 0; k < 4; ++k)
-                            {
-                                int nx = i + dx[k], ny = j + dy[k];
-                                if (nx < c_x && (nx * (b_y - a_y) > ((b_x - a_x) * (ny - b_y) + b_x * (b_y - a_y))) && (nx * (b_y - c_y) < ((b_x - c_x) * (ny - b_y) + b_x * (b_y - c_y))))
-                                {
-                                    base_map[i][j] = EMapGeneratorData::Door;
-                                    break;
-                                }
-                            }
-                        }
-                        else if (EMapGeneratorData::Door == base_map[i][j])
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            base_map[i][j] = EMapGeneratorData::Wall;
-                        }
-                    }
-				}
-			}
-		}
-        break;
-    }
-    case 1:
-    case 2:
+    case URectRoomMapGenerator::RoomType::Rect:
     {
 
         // 사각형
-        //if (CurRect.width >= 3 && CurRect.height >= 3)
         {
 
-			int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x +1, CurRect.x + 1 + CurRect.height / 5);
-			int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y +1, CurRect.y + 1 + CurRect.width / 5);
+            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x + 1, CurRect.x + 1 + CurRect.height / 5);
+            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y + 1, CurRect.y + 1 + CurRect.width / 5);
 
-			int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x) * 4 / 5, CurRect.x + CurRect.height - start_x );
-			int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y) * 4 / 5, CurRect.y + CurRect.width - start_y );
+            int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x) * 4 / 5, CurRect.x + CurRect.height - start_x);
+            int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y) * 4 / 5, CurRect.y + CurRect.width - start_y);
 
             if (len_x < 4 || len_y < 4)
             {
@@ -839,9 +794,9 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                 break;
             }
 
-            for (int i = CurRect.x-1; i <= CurRect.x + CurRect.height; ++i)
+            for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
             {
-                for (int j = CurRect.y-1; j <= CurRect.y + CurRect.width; ++j)
+                for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
                 {
                     if ((i > start_x && i < start_x + len_x) && (j > start_y && j < start_y + len_y))
                     {
@@ -876,13 +831,68 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         break;
 
     }
-    case 3:
-    case 4:
+    case URectRoomMapGenerator::RoomType::Triangle:
+    {
+        {
+            int point_len = GameEngineRandom::MainRandom.RandomInt(0, CurRect.width - 1);
+            int b_x = CurRect.x;
+            int b_y = CurRect.y + point_len;
+
+
+            int a_x = CurRect.x + CurRect.height - 1;
+            int a_y = CurRect.y;
+
+            int c_x = CurRect.x + CurRect.height - 1;
+            int c_y = CurRect.y + CurRect.width - 1;
+
+            if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y])
+            {
+                clean_room = true;
+                break;
+            }
+
+            for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
+            {
+                for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
+                {
+                    if (i < c_x && (i * (b_y - a_y) > ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) && (i * (b_y - c_y) < ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+                    {
+                        base_map[i][j] = EMapGeneratorData::Ground;
+                    }
+                    else
+                    {
+                        if (EMapGeneratorData::Passage == base_map[i][j])
+                        {
+                            for (int k = 0; k < 4; ++k)
+                            {
+                                int nx = i + dx[k], ny = j + dy[k];
+                                if (nx < c_x && (nx * (b_y - a_y) > ((b_x - a_x) * (ny - b_y) + b_x * (b_y - a_y))) && (nx * (b_y - c_y) < ((b_x - c_x) * (ny - b_y) + b_x * (b_y - c_y))))
+                                {
+                                    base_map[i][j] = EMapGeneratorData::Door;
+                                    break;
+                                }
+                            }
+                        }
+                        else if (EMapGeneratorData::Door == base_map[i][j])
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            base_map[i][j] = EMapGeneratorData::Wall;
+                        }
+                    }
+                }
+            }
+        }
+        break;
+    }
+    case URectRoomMapGenerator::RoomType::Rhombus:
     {
         // 마름모
         {
-			int point_x = (CurRect.height - 1) / 2;
-			int point_y = (CurRect.width - 1) / 2;
+            int point_x = (CurRect.height - 1) / 2;
+            int point_y = (CurRect.width - 1) / 2;
 
             int a_x = CurRect.x + point_x;
             int a_y = CurRect.y;
@@ -898,9 +908,9 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             int d_x = CurRect.x + point_x * 2;
             int d_y = CurRect.y + point_y;
 
-            for (int i = CurRect.x-1; i <= CurRect.x + CurRect.height; ++i)
+            for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
             {
-                for (int j = CurRect.y-1; j <= CurRect.y + CurRect.width; ++j)
+                for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
                 {
                     //| x - centerX | / a + | y - centerY | / b <= 1 마름모 내부
                     if (abs(i - (CurRect.x + point_x)) * point_y + abs(j - (CurRect.y + point_y)) * point_x <= point_x * point_y)
@@ -934,17 +944,16 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             }
         }
         break;
-
     }
-    case 5:
+    case URectRoomMapGenerator::RoomType::Circle:
     {
         //circle
-		int mid_x = CurRect.x + (CurRect.height - 1) / 2;
-		int mid_y = CurRect.y + (CurRect.width - 1) / 2;
+        int mid_x = CurRect.x + (CurRect.height - 1) / 2;
+        int mid_y = CurRect.y + (CurRect.width - 1) / 2;
         int radius = CurRect.height > CurRect.width ? CurRect.width / 2 : CurRect.height / 2;
-        for (int i = CurRect.x-1; i <= CurRect.x + CurRect.height; ++i)
+        for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
         {
-            for (int j = CurRect.y-1; j <= CurRect.y + CurRect.width; ++j)
+            for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
             {
 
                 if ((i - mid_x) * (i - mid_x) + (j - mid_y) * (j - mid_y) < radius * radius)
@@ -979,6 +988,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         break;
     }
     default:
+        clean_room = true;
         break;
     }
 

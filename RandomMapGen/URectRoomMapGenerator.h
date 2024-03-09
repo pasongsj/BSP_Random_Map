@@ -1,5 +1,6 @@
 #pragma once
 #include "URectMapGenerator.h"
+#include <set>
 
 // Ό³Έν :
 class URectRoomMapGenerator : public URectMapGenerator
@@ -22,6 +23,17 @@ public:
 
 		RootNode = nullptr;
 		CurMapShape = MapShape::none;
+
+		RoomTypeList.clear();
+
+		const RoomType TypeList[4] = { RoomType::Triangle, RoomType::Rect, RoomType::Rhombus, RoomType::Circle };
+		for (RoomType _Type : TypeList)
+		{
+			if (IgnoreRoomType.end() == IgnoreRoomType.find(_Type))
+			{
+				RoomTypeList.push_back(_Type);
+			}
+		}
 	}
 	URectRoomMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape)
 	{
@@ -39,6 +51,14 @@ public:
 		RootNode = nullptr;
 		CurMapShape = _shape;
 
+		const RoomType TypeList[4] = { RoomType::Triangle, RoomType::Rect, RoomType::Rhombus, RoomType::Circle };
+		for (RoomType _Type : TypeList)
+		{
+			if (IgnoreRoomType.end() == IgnoreRoomType.find(_Type))
+			{
+				RoomTypeList.push_back(_Type);
+			}
+		}
 	}
 	~URectRoomMapGenerator();
 
@@ -51,6 +71,26 @@ public:
 	bool CreateMap() override;
 	bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
 
+	enum class RoomType
+	{
+		None,
+		Rect,
+		Triangle,
+		Rhombus,
+		Circle,
+	};
+	void SetIgnoreRoomType(RoomType _Type)
+	{
+		IgnoreRoomType.insert(_Type);
+	}
+
+	void SetIgnoreRoomType(const std::vector<RoomType>& _TypeVec)
+	{
+		for (RoomType _Type : _TypeVec)
+		{
+			IgnoreRoomType.insert(_Type);
+		}
+	}
 
 protected:
 
@@ -65,6 +105,8 @@ protected:
 
 
 private:
+	std::vector<RoomType> RoomTypeList;
+	std::set<RoomType>	IgnoreRoomType;
 
 	void CreateRoom(Node* _leafNode);
 	void ConnectRoom(Node* main_node, Node* sub_node = nullptr);
