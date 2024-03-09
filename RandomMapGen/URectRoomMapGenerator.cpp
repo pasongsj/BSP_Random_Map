@@ -308,198 +308,198 @@ void URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
 }
 
 
-// 현재 Node를 n개로 나누고싶다는 의미
-bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
-{
-    if (n == 0)
-    {
-        FillTryMapRect(tree->nodeRect, EMapGeneratorData::Wall);
-        return true;
-    }
-    if (n == 1) // 더이상 방을 나눌 필요가 없을 때
-    {
-        if (_size > GetRoomSize(tree->nodeRect)) // 최소 방 크기를 만족하지 않는다면
-        {
-            return false;
-        }
-        LeafNodeList.push_back(tree);
-        return true;
-    }
-
-
-    // 방을 더 나눠야 할 때
-
-    // 현재 노드의 방 정보
-    const RectInt curRect = tree->nodeRect;
-
-    // 가로로 나눌지 세로로 나눌지
-    int maxLength = curRect.height >= curRect.width ? curRect.height : curRect.width;;
-    bool is_height = curRect.height >= curRect.width ? true : false;
-
-    // 5:5 비율로 나눈다고 가정
-	int split = (maxLength - 1) / 2;
-
-    // 왼쪽노드의 방 개수
-    int leftnodecnt = n / 2;
-    // 오른쪽 노드의 방 개수
-    int rightnodecnt = n - leftnodecnt;
-
-    // 최대 방 크기 * 여분 비율
-    int max_room_size = static_cast<int>((_size + 1) * 2 * _rate);
-
-
-    // 5:5로 나누었을 때 Left와 Right임시값
-    RectInt LeftRect, RightRect;
-    GetChildRect(curRect, split, is_height, LeftRect, RightRect);
-
-    int leftSize = GetRoomSize(LeftRect);
-    int rightSize = GetRoomSize(RightRect);
-
-    // 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
-    if (leftSize == 0)
-    {
-        tree->rightNode = new Node();
-        tree->rightNode->nodeRect = RightRect;
-        tree->rightNode->parNode = tree;
-        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    }
-    else if (rightSize == 0)
-    {
-        tree->leftNode = new Node();
-        tree->leftNode->nodeRect = LeftRect;
-        tree->leftNode->parNode = tree;
-        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    }
-
-
-    // 홀수개의 방을 만들어야하는 경우 1 : 2 크기 비율로 split를 계산하기 위함
-    if (n % 2 == 1)
-    {
-        int tmp = (maxLength * leftSize) / (leftSize + 2 * rightSize);
-        split = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (tmp));
-    }
-    else
-    {
-        int tmp = (maxLength * leftSize) / (leftSize + rightSize);
-        split = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (tmp));
-    }
-
-    // split 위치가 사각형을 벗어난 경우
-    if (split < 1 || split > maxLength - 1)
-    {
-        return false;
-    }
-
-    // 나올 수 있는 최대 길이와 최소 길이중에서 랜덤으로 한 값을 선택
-
-
-    {
-        // 방의 여분 비율을 맞추기 위해 split을 조정하는 과정
-        int trycnt = 0;
-        while (true)
-        {
-            trycnt++;
-            if (trycnt > static_cast<int>(maxLength * (1.0f + m_rate)))
-            {
-                return false;
-            }
-            GetChildRect(curRect, split, is_height, LeftRect, RightRect);
-            leftSize = GetRoomSize(LeftRect);
-            rightSize = GetRoomSize(RightRect);
-
-            if (max_room_size * leftnodecnt > leftSize && max_room_size * rightnodecnt > rightSize)
-            {
-                return false;
-            }
-            else if (max_room_size * leftnodecnt > leftSize)
-            {
-                int lim = split + 4 < maxLength - 2 ? split + 4 : maxLength - 2;
-                if (split + 1 > lim)
-                {
-                    return false;
-                }
-                split = GameEngineRandom::MainRandom.RandomInt(split + 1, lim);
-            }
-            else if (max_room_size * rightnodecnt > rightSize)
-            {
-                int lim = split - 4 > 2 ? split - 4 : 2;
-                if (lim > split - 1)
-                {
-                    return false;
-                }
-                split = GameEngineRandom::MainRandom.RandomInt(lim, split - 1);
-            }
-            else
-            {
-                if (
-                    (
-                        true == is_height &&
-                        (
-                            EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y + curRect.width] ||
-                            EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y - 1]
-                            )
-                        )
-                    ||
-                    (
-                        false == is_height &&
-                        (
-                            EMapGeneratorData::Door == try_map_gen[curRect.x + curRect.height][curRect.y + split] ||
-                            EMapGeneratorData::Door == try_map_gen[curRect.x - 1][curRect.y + split])
-                        )
-                    )
-                {
-                    // 홀수개의 방을 만들어야하는 경우 1 : 2 크기 비율로 split를 계산하기 위함
-                    m_rate += 0.02f;
-                    float left_lim, right_lim;
-                    if (split < maxLength / 2)
-                    {
-                        right_lim = static_cast<float>(split - 1);
-                        left_lim = right_lim * (1.0f - m_rate) > 2 ? right_lim * (1.0f - m_rate) : 2;
-                    }
-                    else
-                    {
-                        left_lim = static_cast<float>(split + 1);
-                        right_lim = left_lim * (1.0f + m_rate) < maxLength - 2 ? left_lim * (1.0f + m_rate) : maxLength - 2;
-                    }
-                    if (left_lim >= right_lim)
-                    {
-                        return false;
-                    }
-                    split = GameEngineRandom::MainRandom.RandomInt(static_cast<int>(left_lim), static_cast<int>(right_lim));
-                    continue;
-                }
-                break;
-            }
-        }
-        // 방의 최소 크기를 맞추기 위함이다.
-
-        //왼쪽 노드에 대한 정보다 
-        tree->leftNode = new Node();
-        tree->leftNode->nodeRect = LeftRect;
-
-        //우측 노드에 대한 정보다 
-        tree->rightNode = new Node();
-        tree->rightNode->nodeRect = RightRect;
-
-        //그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
-        DrawLine(curRect, split, is_height, n);
-    }
-
-    tree->leftNode->parNode = tree; //자식노드들의 부모노드를 나누기전 노드로 설정
-    tree->rightNode->parNode = tree;
-
-    // 여분비율을 낮춘다
-    float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
-    if (true == is_height)
-    {
-        return DivideNode(tree->leftNode, leftnodecnt, _size, nrate) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    }
-    else
-    {
-        return DivideNode(tree->rightNode, rightnodecnt, _size, nrate) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
-    }
-
-}
+//// 현재 Node를 n개로 나누고싶다는 의미
+//bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate)
+//{
+//    if (n == 0)
+//    {
+//        FillTryMapRect(tree->nodeRect, EMapGeneratorData::Wall);
+//        return true;
+//    }
+//    if (n == 1) // 더이상 방을 나눌 필요가 없을 때
+//    {
+//        if (_size > GetRoomSize(tree->nodeRect)) // 최소 방 크기를 만족하지 않는다면
+//        {
+//            return false;
+//        }
+//        LeafNodeList.push_back(tree);
+//        return true;
+//    }
+//
+//
+//    // 방을 더 나눠야 할 때
+//
+//    // 현재 노드의 방 정보
+//    const RectInt curRect = tree->nodeRect;
+//
+//    // 가로로 나눌지 세로로 나눌지
+//    int maxLength = curRect.height >= curRect.width ? curRect.height : curRect.width;;
+//    bool is_height = curRect.height >= curRect.width ? true : false;
+//
+//    // 5:5 비율로 나눈다고 가정
+//	int split = (maxLength - 1) / 2;
+//
+//    // 왼쪽노드의 방 개수
+//    int leftnodecnt = n / 2;
+//    // 오른쪽 노드의 방 개수
+//    int rightnodecnt = n - leftnodecnt;
+//
+//    // 최대 방 크기 * 여분 비율
+//    int max_room_size = static_cast<int>((_size + 1) * 2 * _rate);
+//
+//
+//    // 5:5로 나누었을 때 Left와 Right임시값
+//    RectInt LeftRect, RightRect;
+//    GetChildRect(curRect, split, is_height, LeftRect, RightRect);
+//
+//    int leftSize = GetRoomSize(LeftRect);
+//    int rightSize = GetRoomSize(RightRect);
+//
+//    // 한쪽이 모두 -1인경우 방을 만들 수 없기 때문에 반대쪽 노드에 n개만큼 생성한다.
+//    if (leftSize == 0)
+//    {
+//        tree->rightNode = new Node();
+//        tree->rightNode->nodeRect = RightRect;
+//        tree->rightNode->parNode = tree;
+//        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+//    }
+//    else if (rightSize == 0)
+//    {
+//        tree->leftNode = new Node();
+//        tree->leftNode->nodeRect = LeftRect;
+//        tree->leftNode->parNode = tree;
+//        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+//    }
+//
+//
+//    // 홀수개의 방을 만들어야하는 경우 1 : 2 크기 비율로 split를 계산하기 위함
+//    if (n % 2 == 1)
+//    {
+//        int tmp = (maxLength * leftSize) / (leftSize + 2 * rightSize);
+//        split = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (tmp));
+//    }
+//    else
+//    {
+//        int tmp = (maxLength * leftSize) / (leftSize + rightSize);
+//        split = static_cast<int>(GameEngineRandom::MainRandom.RandomFloat(1.0f - m_rate, 1.0f + m_rate) * (tmp));
+//    }
+//
+//    // split 위치가 사각형을 벗어난 경우
+//    if (split < 1 || split > maxLength - 1)
+//    {
+//        return false;
+//    }
+//
+//    // 나올 수 있는 최대 길이와 최소 길이중에서 랜덤으로 한 값을 선택
+//
+//
+//    {
+//        // 방의 여분 비율을 맞추기 위해 split을 조정하는 과정
+//        int trycnt = 0;
+//        while (true)
+//        {
+//            trycnt++;
+//            if (trycnt > static_cast<int>(maxLength * (1.0f + m_rate)))
+//            {
+//                return false;
+//            }
+//            GetChildRect(curRect, split, is_height, LeftRect, RightRect);
+//            leftSize = GetRoomSize(LeftRect);
+//            rightSize = GetRoomSize(RightRect);
+//
+//            if (max_room_size * leftnodecnt > leftSize && max_room_size * rightnodecnt > rightSize)
+//            {
+//                return false;
+//            }
+//            else if (max_room_size * leftnodecnt > leftSize)
+//            {
+//                int lim = split + 4 < maxLength - 2 ? split + 4 : maxLength - 2;
+//                if (split + 1 > lim)
+//                {
+//                    return false;
+//                }
+//                split = GameEngineRandom::MainRandom.RandomInt(split + 1, lim);
+//            }
+//            else if (max_room_size * rightnodecnt > rightSize)
+//            {
+//                int lim = split - 4 > 2 ? split - 4 : 2;
+//                if (lim > split - 1)
+//                {
+//                    return false;
+//                }
+//                split = GameEngineRandom::MainRandom.RandomInt(lim, split - 1);
+//            }
+//            else
+//            {
+//                if (
+//                    (
+//                        true == is_height &&
+//                        (
+//                            EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y + curRect.width] ||
+//                            EMapGeneratorData::Door == try_map_gen[curRect.x + split][curRect.y - 1]
+//                            )
+//                        )
+//                    ||
+//                    (
+//                        false == is_height &&
+//                        (
+//                            EMapGeneratorData::Door == try_map_gen[curRect.x + curRect.height][curRect.y + split] ||
+//                            EMapGeneratorData::Door == try_map_gen[curRect.x - 1][curRect.y + split])
+//                        )
+//                    )
+//                {
+//                    // 홀수개의 방을 만들어야하는 경우 1 : 2 크기 비율로 split를 계산하기 위함
+//                    m_rate += 0.02f;
+//                    float left_lim, right_lim;
+//                    if (split < maxLength / 2)
+//                    {
+//                        right_lim = static_cast<float>(split - 1);
+//                        left_lim = right_lim * (1.0f - m_rate) > 2 ? right_lim * (1.0f - m_rate) : 2;
+//                    }
+//                    else
+//                    {
+//                        left_lim = static_cast<float>(split + 1);
+//                        right_lim = left_lim * (1.0f + m_rate) < maxLength - 2 ? left_lim * (1.0f + m_rate) : maxLength - 2;
+//                    }
+//                    if (left_lim >= right_lim)
+//                    {
+//                        return false;
+//                    }
+//                    split = GameEngineRandom::MainRandom.RandomInt(static_cast<int>(left_lim), static_cast<int>(right_lim));
+//                    continue;
+//                }
+//                break;
+//            }
+//        }
+//        // 방의 최소 크기를 맞추기 위함이다.
+//
+//        //왼쪽 노드에 대한 정보다 
+//        tree->leftNode = new Node();
+//        tree->leftNode->nodeRect = LeftRect;
+//
+//        //우측 노드에 대한 정보다 
+//        tree->rightNode = new Node();
+//        tree->rightNode->nodeRect = RightRect;
+//
+//        //그 후 위 두개의 노드를 나눠준 선을 그리는 함수이다.        
+//        DrawLine(curRect, split, is_height, n);
+//    }
+//
+//    tree->leftNode->parNode = tree; //자식노드들의 부모노드를 나누기전 노드로 설정
+//    tree->rightNode->parNode = tree;
+//
+//    // 여분비율을 낮춘다
+//    float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
+//    if (true == is_height)
+//    {
+//        return DivideNode(tree->leftNode, leftnodecnt, _size, nrate) && DivideNode(tree->rightNode, rightnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+//    }
+//    else
+//    {
+//        return DivideNode(tree->rightNode, rightnodecnt, _size, nrate) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
+//    }
+//
+//}
 
 bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate, bool is_reverse)
 {
@@ -552,14 +552,14 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
         tree->rightNode = new Node();
         tree->rightNode->nodeRect = RightRect;
         tree->rightNode->parNode = tree;
-        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return DivideNode(tree->rightNode, n, _size, _rate, is_reverse);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
     else if (rightSize == 0)
     {
         tree->leftNode = new Node();
         tree->leftNode->nodeRect = LeftRect;
         tree->leftNode->parNode = tree;
-        return DivideNode(tree->rightNode, n, _size, _rate);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
+        return DivideNode(tree->rightNode, n, _size, _rate, is_reverse);//왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
 
 
@@ -694,7 +694,7 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
 
 
 
-bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape)
+bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape)
 {
     base_map = _map;
 
@@ -717,7 +717,18 @@ bool URectRoomMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
         }
     }
 
-    return URectRoomMapGenerator::CreateMap();
+    if (true == URectRoomMapGenerator::CreateMap())
+    {
+        for (int i = 0; i < lx; ++i)
+        {
+            for (int j = 0; j < ly; ++j)
+            {
+                _map[i][j] = base_map[i][j];
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 //자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
@@ -758,8 +769,6 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
 {
     RectInt CurRect = _leafNode->nodeRect;
 
-    //int random_polygon = GameEngineRandom::MainRandom.RandomInt(0, 5);
-
 
     RoomType RandomRoomType = RoomTypeList[GameEngineRandom::MainRandom.RandomInt(0, RoomTypeList.size() - 1)];
 
@@ -782,13 +791,13 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         // 사각형
         {
 
-            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x + 1, CurRect.x + 1 + CurRect.height / 5);
-            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y + 1, CurRect.y + 1 + CurRect.width / 5);
+            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x , CurRect.x + CurRect.height / 4);
+            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y , CurRect.y + CurRect.width / 4);
 
-            int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x) * 4 / 5, CurRect.x + CurRect.height - start_x);
-            int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y) * 4 / 5, CurRect.y + CurRect.width - start_y);
+			int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x ) * 4 / 5, CurRect.x + CurRect.height - start_x);
+			int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y ) * 4 / 5, CurRect.y + CurRect.width - start_y);
 
-            if (len_x < 4 || len_y < 4)
+			if (len_x < 4 || len_y < 4 || (len_x * len_y < min_room_size))
             {
                 clean_room = true;
                 break;
@@ -798,7 +807,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             {
                 for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
                 {
-                    if ((i > start_x && i < start_x + len_x) && (j > start_y && j < start_y + len_y))
+                    if ((i >= start_x && i < start_x + len_x) && (j >= start_y && j < start_y + len_y))
                     {
                         base_map[i][j] = EMapGeneratorData::Ground;
                     }
@@ -809,7 +818,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                             for (int k = 0; k < 4; ++k)
                             {
                                 int nx = i + dx[k], ny = j + dy[k];
-                                if ((nx > start_x && nx < start_x + len_x) && (ny > start_y && ny < start_y + len_y))
+                                if ((nx >= start_x && nx < start_x + len_x) && (ny >= start_y && ny < start_y + len_y))
                                 {
                                     base_map[i][j] = EMapGeneratorData::Door;
                                     break;
@@ -845,7 +854,8 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             int c_x = CurRect.x + CurRect.height - 1;
             int c_y = CurRect.y + CurRect.width - 1;
 
-            if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y])
+            if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y]||
+				CurRect.height * CurRect.width / 2 < min_room_size)
             {
                 clean_room = true;
                 break;
@@ -855,7 +865,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             {
                 for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
                 {
-                    if (i < c_x && (i * (b_y - a_y) > ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) && (i * (b_y - c_y) < ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
+                    if (i <= c_x && (i * (b_y - a_y) >= ((b_x - a_x) * (j - b_y) + b_x * (b_y - a_y))) && (i * (b_y - c_y) <= ((b_x - c_x) * (j - b_y) + b_x * (b_y - c_y))))
                     {
                         base_map[i][j] = EMapGeneratorData::Ground;
                     }
@@ -866,7 +876,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                             for (int k = 0; k < 4; ++k)
                             {
                                 int nx = i + dx[k], ny = j + dy[k];
-                                if (nx < c_x && (nx * (b_y - a_y) > ((b_x - a_x) * (ny - b_y) + b_x * (b_y - a_y))) && (nx * (b_y - c_y) < ((b_x - c_x) * (ny - b_y) + b_x * (b_y - c_y))))
+                                if (nx <= c_x && (nx * (b_y - a_y) >= ((b_x - a_x) * (ny - b_y) + b_x * (b_y - a_y))) && (nx * (b_y - c_y) <= ((b_x - c_x) * (ny - b_y) + b_x * (b_y - c_y))))
                                 {
                                     base_map[i][j] = EMapGeneratorData::Door;
                                     break;
@@ -907,6 +917,12 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
 
             int d_x = CurRect.x + point_x * 2;
             int d_y = CurRect.y + point_y;
+
+            if ((2 * point_x + 1) * (2 * point_y + 1) / 2 < min_room_size)
+            {
+                clean_room = true;
+                break;
+            }
 
             for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
             {
@@ -951,6 +967,12 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         int mid_x = CurRect.x + (CurRect.height - 1) / 2;
         int mid_y = CurRect.y + (CurRect.width - 1) / 2;
         int radius = CurRect.height > CurRect.width ? CurRect.width / 2 : CurRect.height / 2;
+
+        if (static_cast<int>(radius * radius * 3.141592f) < min_room_size)
+        {
+            clean_room = true;
+            break;
+        }
         for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
         {
             for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)

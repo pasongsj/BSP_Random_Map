@@ -1,7 +1,9 @@
 #pragma once
 #include <vector>
+#include <set>
 #include "Node.h"
 #include "GameEngineRandom.h"
+
 
 // 설명 :
 class URectMapGenerator
@@ -9,42 +11,6 @@ class URectMapGenerator
 public:
 	// constrcuter destructer
 	URectMapGenerator();
-	URectMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize)
-	{
-		base_map = _map;
-
-		lx = static_cast<int>(_map.size());
-		ly = static_cast<int>(_map[0].size());
-
-		room_cnt = _roomcnt;
-		min_room_size = _min_room_size;
-		door_size = _doorsize;
-
-		spare = 0.8f;
-
-		RootNode = nullptr;
-
-		CurMapShape = MapShape::none;
-	}
-
-
-	URectMapGenerator(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape)
-	{
-		base_map = _map;
-
-		lx = static_cast<int>(_map.size());
-		ly = static_cast<int>(_map[0].size());
-
-		room_cnt = _roomcnt;
-		min_room_size = _min_room_size;
-		door_size = _doorsize;
-
-		spare = 0.8f;
-
-		RootNode = nullptr;
-
-		CurMapShape = _shape;
-	}
 
 	virtual ~URectMapGenerator();
 
@@ -56,30 +22,50 @@ public:
 
 
 	void Print();
-	virtual bool CreateMap();
-	//virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize);
-	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none);
+
+	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none) = 0;
 
 	void SettingMapShap();
 
+	// room type ignore 
+	enum class RoomType
+	{
+		None,
+		Rect,
+		Triangle,
+		Rhombus,
+		Circle,
+	};
+	void SetIgnoreRoomType(RoomType _Type)
+	{
+		IgnoreRoomType.insert(_Type);
+	}
+
+	void SetIgnoreRoomType(const std::vector<RoomType>& _TypeVec)
+	{
+		for (RoomType _Type : _TypeVec)
+		{
+			IgnoreRoomType.insert(_Type);
+		}
+	}
+
 protected:
 
+	virtual bool CreateMap();
 
 	// 노드 작업 - 노드 제작
-//
-// x,y가 현재 map size 인덱스 내에 있는지 확인하는 작업
+	//
+	// x,y가 현재 map size 인덱스 내에 있는지 확인하는 작업
 	bool InRange(int x, int y);
 
 	// 현재 Node를 n개로 나누고싶다는 의미
-	virtual bool DivideNode(Node* tree, int n, int _size, float _rate) { return true; };
+	//virtual bool DivideNode(Node* tree, int n, int _size, float _rate) { return false; };
 
 	//자식 노드를 만들고 구분선을 그리는 함수 _cur 사각형에 대한 splite구분선이다
-	virtual bool DrawLine(const RectInt& _cur, int splite, bool is_height, int n) { return true; };
+	virtual bool DrawLine(const RectInt& _cur, int splite, bool is_height, int n) { return false; };
 
 	// 현재 Rect를 나누어 Left와 Right노드의 크기를 가져올 수 있도록 함
 	void GetChildRect(const RectInt& _cur, int _split, bool is_height, RectInt& Left, RectInt& Right);
-
-
 
 
 	// 사전작업
@@ -109,10 +95,6 @@ protected:
 
 
 
-
-
-
-
 	std::vector<std::vector<EMapGeneratorData>>	base_map;
 	std::vector<std::vector<bool>>	is_visited;		// SetWallBFS()에서 중복체크를 피하기 위함
 	std::vector<std::vector<int>>	map_size_Index;		// RectInt에 해당하는 부분의 넓이를 빠르게 구하기 위함
@@ -131,12 +113,21 @@ protected:
 	std::vector<Node*> LeafNodeList;	// 말단노드(방이 만들어질 수 있는 노드)
 	std::vector<Node*> ShapeList;
 
+	// RectInt에 해당하는 부분을 void tile 처리
 	void RemoveRect(RectInt CurRect);
+	// RectInt에 해당하는 테두리를 Wall 처리
 	void DrawRect(RectInt& CurRect);
+	// RectInt에 해당하는 부분을 voidtile을 제외하고 data로 변경
 	void FillTryMapRect(RectInt CurRect,EMapGeneratorData _data);
 
 	MapShape CurMapShape;
 
+
+
+	//room type ingore
+		// 공간내에 만들 방의 모양 리스트
+	std::vector<RoomType> RoomTypeList;
+	std::set<RoomType>	IgnoreRoomType;
 
 private:
 	

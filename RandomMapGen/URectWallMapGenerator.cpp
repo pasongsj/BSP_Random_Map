@@ -155,7 +155,7 @@ bool URectWallMapGenerator::CreateMap()
 }
 
 
-bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape )
+bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape )
 {
     base_map = _map;
 
@@ -169,7 +169,18 @@ bool URectWallMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>
     spare = 0.8f;
     CurMapShape = _Shape;
 
-    return URectWallMapGenerator::CreateMap();
+    if (true == URectWallMapGenerator::CreateMap())
+    {
+        for (int i = 0; i < lx; ++i)
+        {
+            for (int j = 0; j < ly; ++j)
+            {
+                _map[i][j] = base_map[i][j];
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 

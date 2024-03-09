@@ -315,9 +315,8 @@ void URectMapGenerator::SettingMapShap()
 bool URectMapGenerator::CreateMap()
 {
     Init();
+
     SettingMapShap();
-
-
     //// 맵 크기를 빠르게 계산하기 위함
     CalMapSizeIndex();
 
@@ -326,26 +325,6 @@ bool URectMapGenerator::CreateMap()
 
     return true;
 }
-
-bool URectMapGenerator::CreateMap(std::vector<std::vector<EMapGeneratorData>> _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape)
-{
-    base_map = _map;
-
-    lx = static_cast<int>(_map.size());
-    ly = static_cast<int>(_map[0].size());
-
-    room_cnt = _roomcnt;
-    min_room_size = _min_room_size;
-    door_size = _doorsize;
-
-    spare = 0.8f;
-    CurMapShape = _shape;
-
-    return CreateMap();
-}
-
-
-
 #include <map>
 
 void URectMapGenerator::Print()

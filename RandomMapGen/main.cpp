@@ -6,10 +6,11 @@
 #include "URectCaveMapGenerator.h"
 
 
+#include <map>
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	std::vector<std::vector<EMapGeneratorData>> Map(50, std::vector< EMapGeneratorData>(50, EMapGeneratorData::Ground));
+	std::vector<std::vector<EMapGeneratorData>> Map(30, std::vector< EMapGeneratorData>(30, EMapGeneratorData::Ground));
 
 	//int* a = new int();
 	// 
@@ -58,12 +59,24 @@ int main()
 	//}
 
 
-	URectRoomMapGenerator* NewMap = new URectRoomMapGenerator();
-	NewMap->SetIgnoreRoomType({ URectRoomMapGenerator::RoomType::Circle, URectRoomMapGenerator::RoomType::Rhombus });
-	if (true == NewMap->CreateMap(Map,30, 5, 1, MapShape::mieum))
+	URectMapGenerator* NewMap = new URectRoomMapGenerator();
+	//NewMap->SetIgnoreRoomType({ URectMapGenerator::RoomType::Circle, URectMapGenerator::RoomType::Triangle, URectMapGenerator::RoomType::Rect });
+	if (true == NewMap->CreateMap(Map,15, 5, 1, MapShape::none))
 	{
 		NewMap->Print();
 	}
+
+	//std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"°‡ "},{EMapGeneratorData::Wall, "∫Æ"},{EMapGeneratorData::Door,"πÆ"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "≈Î"} };
+
+	//for (int i = 0; i < Map.size(); ++i)
+	//{
+	//	for (int j = 0; j < Map[0].size(); ++j)
+	//	{
+	//		std::cout << printmatch[Map[i][j]] << ' ';
+	//	}
+	//	std::cout << '\n';
+	//}
+	//std::cout << '\n';
 	delete NewMap;
 
 
