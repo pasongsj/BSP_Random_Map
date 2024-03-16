@@ -34,7 +34,7 @@ int main()
 	EMapType EType = EMapType::Cave;
 	int Select = static_cast<int>(EType);
 
-	GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
 
 	std::cout << "맵 타입을 선택해주세요 : " << std::endl;
