@@ -1,6 +1,7 @@
 #include <vector>
 #include <crtdbg.h>
 #include <chrono>
+#include <conio.h>
 
 #include "URectWallMapGenerator.h"
 #include "URectRoomMapGenerator.h"
@@ -36,37 +37,43 @@ int main()
 
 	GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
-
-	std::cout << "맵 타입을 선택해주세요 : " << std::endl;
-	std::cout << "1 벽" << std::endl;
-	std::cout << "2 방" << std::endl;
-	std::cout << "3 동굴" << std::endl;
-	std::cin >> Select;
-	EType = static_cast<EMapType>(Select - 1);
-
-	switch (EType)
+	while (true)
 	{
-	case EMapType::Wall:
-		NewMap = new URectWallMapGenerator();
-		break;
-	case EMapType::Room:
-		NewMap = new URectRoomMapGenerator();
-		break;
-	case EMapType::Cave:
-		NewMap = new URectCaveMapGenerator();
-		break;
-	default:
-		break;
-	}
+		system("cls");
 
-	
-	//NewMap->SetIgnoreRoomType({ URectMapGenerator::RoomType::Circle, URectMapGenerator::RoomType::Triangle, URectMapGenerator::RoomType::Rect });
-	if (true == NewMap->CreateMap(Map,15, 5, 1, MapShape::none))
-	{
-		NewMap->Print();
-	}
+		std::cout << "맵 타입을 선택해주세요 : " << std::endl;
+		std::cout << "1 벽" << std::endl;
+		std::cout << "2 방" << std::endl;
+		std::cout << "3 동굴" << std::endl;
+		std::cin >> Select;
+		EType = static_cast<EMapType>(Select - 1);
 
-	delete NewMap;
+		switch (EType)
+		{
+		case EMapType::Wall:
+			NewMap = new URectWallMapGenerator();
+			break;
+		case EMapType::Room:
+			NewMap = new URectRoomMapGenerator();
+			break;
+		case EMapType::Cave:
+			NewMap = new URectCaveMapGenerator();
+			break;
+		default:
+			break;
+		}
+
+
+		//NewMap->SetIgnoreRoomType({ URectMapGenerator::RoomType::Circle, URectMapGenerator::RoomType::Triangle, URectMapGenerator::RoomType::Rect });
+		if (true == NewMap->CreateMap(Map, 15, 5, 1, MapShape::none))
+		{
+			NewMap->Print();
+		}
+
+		delete NewMap;
+
+		_getch();
+	}
 
 
 	return 0;
