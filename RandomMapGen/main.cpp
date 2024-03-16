@@ -35,7 +35,6 @@ int main()
 	EMapType EType = EMapType::Cave;
 	int Select = static_cast<int>(EType);
 
-	GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
 	while (true)
 	{
@@ -69,12 +68,22 @@ int main()
 			break;
 		}
 
+		std::cout << "몇회 반복 하시겠습니까? : " << std::endl;
+		std::cin >> Select;
 
-		//NewMap->SetIgnoreRoomType({ URectMapGenerator::RoomType::Circle, URectMapGenerator::RoomType::Triangle, URectMapGenerator::RoomType::Rect });
-		if (true == NewMap->CreateMap(Map, 15, 5, 1, MapShape::none))
+
+		while (Select--)
 		{
-			NewMap->Print();
+			GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+
+			if (true == NewMap->CreateMap(Map, 15, 5, 1, MapShape::none))
+			{
+				NewMap->Print();
+				std::cout << std::endl;
+			}
+			
 		}
+
 
 		delete NewMap;
 
