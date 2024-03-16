@@ -51,14 +51,20 @@ int main()
 		switch (EType)
 		{
 		case EMapType::Wall:
+		{
 			NewMap = new URectWallMapGenerator();
 			break;
+		}
 		case EMapType::Room:
+		{
 			NewMap = new URectRoomMapGenerator();
 			break;
+		}
 		case EMapType::Cave:
+		{
 			NewMap = new URectCaveMapGenerator();
 			break;
+		}
 		default:
 			break;
 		}
