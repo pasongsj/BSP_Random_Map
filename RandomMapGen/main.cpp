@@ -1,5 +1,6 @@
 #include <vector>
 #include <crtdbg.h>
+#include <chrono>
 
 #include "URectWallMapGenerator.h"
 #include "URectRoomMapGenerator.h"
@@ -26,57 +27,45 @@ int main()
 			Map[Map.size()-1-i][Map[0].size() - j - 1] = EMapGeneratorData::VoidTile;
 		}
 	}
-	//for (int i = 0; i < 10; ++i)
-	//{
-	//	for (int j = 0; j < 10; ++j)
-	//	{
-	//		Map[i][j] = EMapGeneratorData::VoidTile;
-	//	}
-	//}
-	//
-	//for (int i = 0; i < 10; ++i)
-	//{
-	//	for (int j = 40; j < 50; ++j)
-	//	{
-	//		Map[i][j] = EMapGeneratorData::VoidTile;
-	//	}
-	//}
-	//
-	//for (int i = 40; i < 50; ++i)
-	//{
-	//	for (int j = 0; j < 10; ++j)
-	//	{
-	//		Map[i][j] = EMapGeneratorData::VoidTile;
-	//	}
-	//}
-	//
-	//for (int i = 40; i < 50; ++i)
-	//{
-	//	for (int j = 30; j < 40; ++j)
-	//	{
-	//		Map[i][j] = EMapGeneratorData::VoidTile;
-	//	}
-	//}
 
 
-	URectMapGenerator* NewMap = new URectRoomMapGenerator();
+	URectMapGenerator* NewMap = nullptr;
+
+	EMapType EType = EMapType::Cave;
+	int Select = static_cast<int>(EType);
+
+	GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+
+
+	std::cout << "맵 타입을 선택해주세요 : " << std::endl;
+	std::cout << "1 벽" << std::endl;
+	std::cout << "2 방" << std::endl;
+	std::cout << "3 동굴" << std::endl;
+	std::cin >> Select;
+	EType = static_cast<EMapType>(Select - 1);
+
+	switch (EType)
+	{
+	case EMapType::Wall:
+		NewMap = new URectWallMapGenerator();
+		break;
+	case EMapType::Room:
+		NewMap = new URectRoomMapGenerator();
+		break;
+	case EMapType::Cave:
+		NewMap = new URectCaveMapGenerator();
+		break;
+	default:
+		break;
+	}
+
+	
 	//NewMap->SetIgnoreRoomType({ URectMapGenerator::RoomType::Circle, URectMapGenerator::RoomType::Triangle, URectMapGenerator::RoomType::Rect });
 	if (true == NewMap->CreateMap(Map,15, 5, 1, MapShape::none))
 	{
 		NewMap->Print();
 	}
 
-	//std::map< EMapGeneratorData, std::string> printmatch = { {EMapGeneratorData::Ground,"□ "},{EMapGeneratorData::Wall, "벽"},{EMapGeneratorData::Door,"문"},{EMapGeneratorData::VoidTile,"X "},{EMapGeneratorData::Passage, "통"} };
-
-	//for (int i = 0; i < Map.size(); ++i)
-	//{
-	//	for (int j = 0; j < Map[0].size(); ++j)
-	//	{
-	//		std::cout << printmatch[Map[i][j]] << ' ';
-	//	}
-	//	std::cout << '\n';
-	//}
-	//std::cout << '\n';
 	delete NewMap;
 
 

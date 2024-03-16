@@ -147,6 +147,13 @@ public:
 	}
 };
 
+enum class EMapType /*: uint8*/
+{
+	Wall, //UMETA(DisplayName = "땅"),
+	Room, //UMETA(DisplayName = "문"),
+	Cave, //방을 연결하는 통로
+};
+
 enum class EMapGeneratorData /*: uint8*/
 {
 	Ground, //UMETA(DisplayName = "땅"),
