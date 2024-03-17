@@ -1,9 +1,9 @@
 #include "URectRoomMapGenerator.h"
-URectRoomMapGenerator::URectRoomMapGenerator() 
+URectRoomMapGenerator::URectRoomMapGenerator()
 {
 }
 
-URectRoomMapGenerator::~URectRoomMapGenerator() 
+URectRoomMapGenerator::~URectRoomMapGenerator()
 {
 }
 
@@ -24,23 +24,23 @@ bool URectRoomMapGenerator::CreateMap()
         // 맵 생성
 
 
-		bool can_gen = true;
+        bool can_gen = true;
         if (CurMapShape == MapShape::none)
         {
             // 방 크기의 여유 비율
             float ratio = static_cast<float>(GetRoomSize({ 1, 1, lx - 2, ly - 2 })) / ((min_room_size + 1) * 2 * room_cnt);
             float _rate = ratio * spare + 0.1f < 1.0f ? 1.0f : ratio * spare + 0.1f;
 
-			if (nullptr == RootNode)
-			{
-				RootNode = new Node();
-				RootNode->nodeRect = { 1, 1, lx - 2, ly - 2 }; // 맵의 테두리를 제외한 크기의 루트노드
-			}
-			can_gen = DivideNode(RootNode, room_cnt, min_room_size, _rate, true);
+            if (nullptr == RootNode)
+            {
+                RootNode = new Node();
+                RootNode->nodeRect = { 1, 1, lx - 2, ly - 2 }; // 맵의 테두리를 제외한 크기의 루트노드
+            }
+            can_gen = DivideNode(RootNode, room_cnt, min_room_size, _rate, true);
         }
         else
         {
-            
+
             int remain_room = room_cnt % ShapeList.size();
             for (Node* Roots : ShapeList)
             {
@@ -59,7 +59,7 @@ bool URectRoomMapGenerator::CreateMap()
                 }
             }
         }
-       
+
 
         if (true == can_gen) // 랜덤맵 생성 성공
         {
@@ -105,12 +105,12 @@ bool URectRoomMapGenerator::CreateMap()
     switch (CurMapShape)
     {
     case MapShape::none:
-        can_connect = ConnectRoom(RootNode->leftNode,RootNode->rightNode);
+        can_connect = ConnectRoom(RootNode->leftNode, RootNode->rightNode);
         break;
     case MapShape::giyeok:
         for (int i = 0; i < ShapeList.size() - 1; ++i)
         {
-			can_connect = can_connect && ConnectRoom(ShapeList[i], ShapeList[i + 1]);
+            can_connect = can_connect && ConnectRoom(ShapeList[i], ShapeList[i + 1]);
         }
         break;
     case MapShape::digeut:
@@ -122,7 +122,7 @@ bool URectRoomMapGenerator::CreateMap()
     case MapShape::mieum:
         for (int i = 0; i < ShapeList.size() - 1; ++i)
         {
-            can_connect = can_connect && ConnectRoom(ShapeList[i], ShapeList[i+1]);
+            can_connect = can_connect && ConnectRoom(ShapeList[i], ShapeList[i + 1]);
         }
         //ConnectRoom(ShapeList[ShapeList.size() - 1]);
         break;
@@ -151,7 +151,7 @@ bool URectRoomMapGenerator::CreateMap()
     }
 
 
-         //방 모양 만들기
+    //방 모양 만들기
     for (Node* _leaf : LeafNodeList)
     {
         CreateRoom(_leaf);
@@ -178,17 +178,17 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
     {
         return true;
     }
-	RectInt f_rect = main_node->nodeRect;
+    RectInt f_rect = main_node->nodeRect;
     RectInt s_rect = sub_node->nodeRect;
 
     const int dx[8] = { 0,0,1,-1 , -1, -1, 1,1 };
     const int dy[8] = { 1,-1,0,0 , -1, 1, -1,1 };
-    
+
     // x축(세로)가 공통인지 확인
     if (f_rect.x == s_rect.x)
     {
         int tmpy = f_rect.y > s_rect.y ? f_rect.y - 1 : s_rect.y - 1;
-        for (int i = f_rect.x + door_size; i < f_rect.x + f_rect.height- door_size; ++i)
+        for (int i = f_rect.x + door_size; i < f_rect.x + f_rect.height - door_size; ++i)
         {
 
             if (base_map[i][tmpy] != EMapGeneratorData::VoidTile && base_map[i][tmpy] != EMapGeneratorData::Passage)
@@ -196,7 +196,7 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
                 bool can_passage = true;
                 for (int d = 0; d < door_size; d++)
                 {
-                    if (base_map[i+d][tmpy - 1] == EMapGeneratorData::Wall || base_map[i+d][tmpy + 1] == EMapGeneratorData::Wall)
+                    if (base_map[i + d][tmpy - 1] == EMapGeneratorData::Wall || base_map[i + d][tmpy + 1] == EMapGeneratorData::Wall)
                     {
                         can_passage = false;
                         break;
@@ -209,13 +209,13 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
                 for (int k = 0; k < 8; ++k)
                 {
                     int nx = i + dx[k], ny = tmpy + dy[k];
-					if (false == InRange(nx, ny) || EMapGeneratorData::VoidTile == base_map[nx][ny])
+                    if (false == InRange(nx, ny) || EMapGeneratorData::VoidTile == base_map[nx][ny])
                     {
                         can_passage = false;
                         break;
                     }
                 }
-                if(true == can_passage)
+                if (true == can_passage)
                 {
                     candoorvec.push_back(i);
                 }
@@ -226,30 +226,30 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
         {
             return false;
         }
-		int midx = candoorvec[GameEngineRandom::MainRandom.RandomInt(0, candoorvec_cnt)];
+        int midx = candoorvec[GameEngineRandom::MainRandom.RandomInt(0, candoorvec_cnt)];
         int miny = std::min(f_rect.GetMidy(), s_rect.GetMidy());
         int maxy = std::max(f_rect.GetMidy(), s_rect.GetMidy());
         for (int j = miny; j < maxy; ++j)
         {
             for (int d = 0; d < door_size; ++d)
             {
-				if (EMapGeneratorData::VoidTile != base_map[midx + d][j])
-				{
-					bool can_passage = true;
-					for (int k = 0; k < 8; ++k)
-					{
-						int nx = midx + d + dx[k], ny = j + dy[k];
-						if (false == InRange(nx, ny) || EMapGeneratorData::VoidTile == base_map[nx][ny])
-						{
-							can_passage = false;
-							break;
-						}
-					}
-					if (true == can_passage)
-					{
-						base_map[midx + d][j] = EMapGeneratorData::Passage;
-					}
-				}
+                if (EMapGeneratorData::VoidTile != base_map[midx + d][j])
+                {
+                    bool can_passage = true;
+                    for (int k = 0; k < 8; ++k)
+                    {
+                        int nx = midx + d + dx[k], ny = j + dy[k];
+                        if (false == InRange(nx, ny) || EMapGeneratorData::VoidTile == base_map[nx][ny])
+                        {
+                            can_passage = false;
+                            break;
+                        }
+                    }
+                    if (true == can_passage)
+                    {
+                        base_map[midx + d][j] = EMapGeneratorData::Passage;
+                    }
+                }
             }
 
         }
@@ -258,18 +258,18 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
     {
         std::vector<int> candoorvec;
         int tmpx = f_rect.x > s_rect.x ? f_rect.x - 1 : s_rect.x - 1;
-        for (int i = f_rect.y + door_size; i < f_rect.y + f_rect.width- door_size; ++i)
+        for (int i = f_rect.y + door_size; i < f_rect.y + f_rect.width - door_size; ++i)
         {
             if (base_map[tmpx][i] != EMapGeneratorData::VoidTile && base_map[tmpx][i] != EMapGeneratorData::Passage)
             {
                 bool can_passage = true;
-                for (int d = 0; d < door_size ; d++)
+                for (int d = 0; d < door_size; d++)
                 {
-					if (base_map[tmpx - 1][i + d] == EMapGeneratorData::Wall || base_map[tmpx + 1][i + d] == EMapGeneratorData::Wall)
-					{
+                    if (base_map[tmpx - 1][i + d] == EMapGeneratorData::Wall || base_map[tmpx + 1][i + d] == EMapGeneratorData::Wall)
+                    {
                         can_passage = false;
                         break;
-					}
+                    }
                 }
                 if (false == can_passage)
                 {
@@ -303,7 +303,7 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
         {
             for (int d = 0; d < door_size; ++d)
             {
-                if (EMapGeneratorData::VoidTile != base_map[j][midy+d])
+                if (EMapGeneratorData::VoidTile != base_map[j][midy + d])
                 {
                     bool can_passage = true;
                     for (int k = 0; k < 8; ++k)
@@ -338,7 +338,7 @@ bool URectRoomMapGenerator::ConnectRoom(Node* main_node, Node* sub_node) // 1 과
                 return false;
             }
         }
-        else 
+        else
         {
             if (false == ConnectRoom(main_node, main_node->rightNode))
             {
@@ -595,7 +595,7 @@ bool URectRoomMapGenerator::DivideNode(Node* tree, int n, int _size, float _rate
 
     // 여분비율을 낮춘다
     float nrate = _rate * spare > 1.0 ? _rate * spare : 1.0f;
-    if (true == is_reverse && CurMapShape!= MapShape::none) // 역순
+    if (true == is_reverse && CurMapShape != MapShape::none) // 역순
     {
         return DivideNode(tree->rightNode, rightnodecnt, _size, nrate, true) && DivideNode(tree->leftNode, leftnodecnt, _size, nrate, false); //왼쪽, 오른쪽 자식 노드들도 나눠준다.
     }
@@ -698,8 +698,8 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         //random_polygon = 6;
         clean_room = true;
     }
-	const int dx[4] = { 0,0,1,-1 };
-	const int dy[4] = { 1,-1,0,0 };
+    const int dx[4] = { 0,0,1,-1 };
+    const int dy[4] = { 1,-1,0,0 };
 
 
     switch (RandomRoomType)
@@ -710,13 +710,13 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
         // 사각형
         {
 
-            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x , CurRect.x + CurRect.height / 4);
-            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y , CurRect.y + CurRect.width / 4);
+            int start_x = GameEngineRandom::MainRandom.RandomInt(CurRect.x, CurRect.x + CurRect.height / 4);
+            int start_y = GameEngineRandom::MainRandom.RandomInt(CurRect.y, CurRect.y + CurRect.width / 4);
 
-			int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x ) * 4 / 5, CurRect.x + CurRect.height - start_x);
-			int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y ) * 4 / 5, CurRect.y + CurRect.width - start_y);
+            int len_x = GameEngineRandom::MainRandom.RandomInt((CurRect.x + CurRect.height - start_x) * 4 / 5, CurRect.x + CurRect.height - start_x);
+            int len_y = GameEngineRandom::MainRandom.RandomInt((CurRect.y + CurRect.width - start_y) * 4 / 5, CurRect.y + CurRect.width - start_y);
 
-			if (len_x < 4 || len_y < 4 || (len_x * len_y < min_room_size))
+            if (len_x < 4 || len_y < 4 || (len_x * len_y < min_room_size))
             {
                 clean_room = true;
                 break;
@@ -732,7 +732,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-/*                        if (EMapGeneratorData::Passage == base_map[i][j])
+                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -744,7 +744,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else */if (EMapGeneratorData::Passage == base_map[i][j])
+                        else if (EMapGeneratorData::Door == base_map[i][j])
                         {
                             continue;
                         }
@@ -773,8 +773,8 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
             int c_x = CurRect.x + CurRect.height - 1;
             int c_y = CurRect.y + CurRect.width - 1;
 
-            if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y]||
-				CurRect.height * CurRect.width / 2 < min_room_size)
+            if (EMapGeneratorData::Ground != base_map[b_x][b_y] || EMapGeneratorData::Ground != base_map[a_x][a_y] || EMapGeneratorData::Ground != base_map[c_x][c_y] ||
+                CurRect.height * CurRect.width / 2 < min_room_size)
             {
                 clean_room = true;
                 break;
@@ -790,7 +790,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-/*                        if (EMapGeneratorData::Passage == base_map[i][j])
+                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -802,7 +802,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else */if (EMapGeneratorData::Passage == base_map[i][j])
+                        else if (EMapGeneratorData::Door == base_map[i][j])
                         {
                             continue;
                         }
@@ -854,7 +854,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-/*                        if (EMapGeneratorData::Passage == base_map[i][j])
+                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -866,7 +866,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else */if (EMapGeneratorData::Passage == base_map[i][j])
+                        else if (EMapGeneratorData::Door == base_map[i][j])
                         {
                             continue;
                         }
@@ -903,7 +903,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                 }
                 else
                 {
-/*                    if (EMapGeneratorData::Passage == base_map[i][j])
+                    if (EMapGeneratorData::Passage == base_map[i][j])
                     {
                         for (int k = 0; k < 4; ++k)
                         {
@@ -915,7 +915,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                             }
                         }
                     }
-                    else*/ if (EMapGeneratorData::Passage == base_map[i][j])
+                    else if (EMapGeneratorData::Door == base_map[i][j])
                     {
                         continue;
                     }
@@ -935,40 +935,40 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
 
     if (true == clean_room)
     {
-		for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
-		{
-			for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
-			{
-				if (EMapGeneratorData::Passage == base_map[i][j])
-				{
-					base_map[i][j] = EMapGeneratorData::Ground;
-				}
-			}
-		}
+        for (int i = CurRect.x; i < CurRect.x + CurRect.height; ++i)
+        {
+            for (int j = CurRect.y; j < CurRect.y + CurRect.width; ++j)
+            {
+                if (EMapGeneratorData::Passage == base_map[i][j])
+                {
+                    base_map[i][j] = EMapGeneratorData::Ground;
+                }
+            }
+        }
 
 
-		//for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
-		//{
-		//	if (EMapGeneratorData::Passage == base_map[i][CurRect.y - 1])
-		//	{
-		//		base_map[i][CurRect.y - 1] = EMapGeneratorData::Door;
-		//	}
-		//	if (EMapGeneratorData::Passage == base_map[i][CurRect.y + CurRect.width])
-		//	{
-		//		base_map[i][CurRect.y + CurRect.width] = EMapGeneratorData::Door;
-		//	}
-		//}
-		//for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
-		//{
-		//	if (EMapGeneratorData::Passage == base_map[CurRect.x - 1][j])
-		//	{
-		//		base_map[CurRect.x - 1][j] = EMapGeneratorData::Door;
-		//	}
-		//	if (EMapGeneratorData::Passage == base_map[CurRect.x + CurRect.height][j])
-		//	{
-		//		base_map[CurRect.x + CurRect.height][j] = EMapGeneratorData::Door;
-		//	}
-		//}
+        for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
+        {
+            if (EMapGeneratorData::Passage == base_map[i][CurRect.y - 1])
+            {
+                base_map[i][CurRect.y - 1] = EMapGeneratorData::Door;
+            }
+            if (EMapGeneratorData::Passage == base_map[i][CurRect.y + CurRect.width])
+            {
+                base_map[i][CurRect.y + CurRect.width] = EMapGeneratorData::Door;
+            }
+        }
+        for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
+        {
+            if (EMapGeneratorData::Passage == base_map[CurRect.x - 1][j])
+            {
+                base_map[CurRect.x - 1][j] = EMapGeneratorData::Door;
+            }
+            if (EMapGeneratorData::Passage == base_map[CurRect.x + CurRect.height][j])
+            {
+                base_map[CurRect.x + CurRect.height][j] = EMapGeneratorData::Door;
+            }
+        }
     }
     return;
 }
