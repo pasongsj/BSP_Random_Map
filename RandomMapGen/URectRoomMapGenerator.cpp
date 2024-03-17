@@ -732,7 +732,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-                        if (EMapGeneratorData::Passage == base_map[i][j])
+/*                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -744,7 +744,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else if (EMapGeneratorData::Door == base_map[i][j])
+                        else */if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             continue;
                         }
@@ -790,7 +790,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-                        if (EMapGeneratorData::Passage == base_map[i][j])
+/*                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -802,7 +802,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else if (EMapGeneratorData::Door == base_map[i][j])
+                        else */if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             continue;
                         }
@@ -854,7 +854,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                     }
                     else
                     {
-                        if (EMapGeneratorData::Passage == base_map[i][j])
+/*                        if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             for (int k = 0; k < 4; ++k)
                             {
@@ -866,7 +866,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                                 }
                             }
                         }
-                        else if (EMapGeneratorData::Door == base_map[i][j])
+                        else */if (EMapGeneratorData::Passage == base_map[i][j])
                         {
                             continue;
                         }
@@ -903,7 +903,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                 }
                 else
                 {
-                    if (EMapGeneratorData::Passage == base_map[i][j])
+/*                    if (EMapGeneratorData::Passage == base_map[i][j])
                     {
                         for (int k = 0; k < 4; ++k)
                         {
@@ -915,7 +915,7 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
                             }
                         }
                     }
-                    else if (EMapGeneratorData::Door == base_map[i][j])
+                    else*/ if (EMapGeneratorData::Passage == base_map[i][j])
                     {
                         continue;
                     }
@@ -947,28 +947,28 @@ void URectRoomMapGenerator::CreateRoom(Node* _leafNode)
 		}
 
 
-		for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
-		{
-			if (EMapGeneratorData::Passage == base_map[i][CurRect.y - 1])
-			{
-				base_map[i][CurRect.y - 1] = EMapGeneratorData::Door;
-			}
-			if (EMapGeneratorData::Passage == base_map[i][CurRect.y + CurRect.width])
-			{
-				base_map[i][CurRect.y + CurRect.width] = EMapGeneratorData::Door;
-			}
-		}
-		for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
-		{
-			if (EMapGeneratorData::Passage == base_map[CurRect.x - 1][j])
-			{
-				base_map[CurRect.x - 1][j] = EMapGeneratorData::Door;
-			}
-			if (EMapGeneratorData::Passage == base_map[CurRect.x + CurRect.height][j])
-			{
-				base_map[CurRect.x + CurRect.height][j] = EMapGeneratorData::Door;
-			}
-		}
+		//for (int i = CurRect.x - 1; i <= CurRect.x + CurRect.height; ++i)
+		//{
+		//	if (EMapGeneratorData::Passage == base_map[i][CurRect.y - 1])
+		//	{
+		//		base_map[i][CurRect.y - 1] = EMapGeneratorData::Door;
+		//	}
+		//	if (EMapGeneratorData::Passage == base_map[i][CurRect.y + CurRect.width])
+		//	{
+		//		base_map[i][CurRect.y + CurRect.width] = EMapGeneratorData::Door;
+		//	}
+		//}
+		//for (int j = CurRect.y - 1; j <= CurRect.y + CurRect.width; ++j)
+		//{
+		//	if (EMapGeneratorData::Passage == base_map[CurRect.x - 1][j])
+		//	{
+		//		base_map[CurRect.x - 1][j] = EMapGeneratorData::Door;
+		//	}
+		//	if (EMapGeneratorData::Passage == base_map[CurRect.x + CurRect.height][j])
+		//	{
+		//		base_map[CurRect.x + CurRect.height][j] = EMapGeneratorData::Door;
+		//	}
+		//}
     }
     return;
 }
