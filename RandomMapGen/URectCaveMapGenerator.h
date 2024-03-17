@@ -17,7 +17,7 @@ public:
 
 
 	// _map : 입력 맵, room cnt: 상관없음 ,_min_room_size :(10~90%로) ground분포 확률,_doorsize : 상관없음, _Shape : 전체 맵 모양
-	bool CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
+	bool CreateMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
 
 
 protected:

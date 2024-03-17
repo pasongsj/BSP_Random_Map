@@ -23,7 +23,7 @@ public:
 
 	void Print();
 
-	virtual bool CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none) = 0;
+	virtual bool CreateMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none) = 0;
 
 	void SettingMapShap();
 

@@ -17,7 +17,7 @@ public:
 	URectWallMapGenerator& operator=(URectWallMapGenerator&& _Other) noexcept = delete;
 
 	// _map : 입력 맵, room cnt: 방의 개수 ,_min_room_size :최소 방의 크기, _doorsize : 문의 크기, _Shape : 전체 맵 모양
-	bool CreateMap(std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
+	bool CreateMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _Shape = MapShape::none) override;
 
 protected:
 

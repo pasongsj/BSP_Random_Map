@@ -81,11 +81,34 @@ int main()
 				NewMap->Print();
 				std::cout << std::endl;
 			}
+
+			delete NewMap;
+			NewMap = nullptr;
+			
+			switch (EType)
+			{
+			case EMapType::Wall:
+			{
+				NewMap = new URectWallMapGenerator();
+				break;
+			}
+			case EMapType::Room:
+			{
+				NewMap = new URectRoomMapGenerator();
+				break;
+			}
+			case EMapType::Cave:
+			{
+				NewMap = new URectCaveMapGenerator();
+				break;
+			}
+			default:
+				break;
+			}
 			
 		}
 
 
-		delete NewMap;
 
 		_getch();
 	}
