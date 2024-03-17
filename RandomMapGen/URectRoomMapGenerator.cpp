@@ -87,7 +87,6 @@ bool URectRoomMapGenerator::CreateMap()
             spare += 0.01f;
             if (spare >= 1.0f) // ·£´ý¸Ê »ý¼º ½ÇÆÐ
             {
-                printf("err");
                 return false;
             }
         }

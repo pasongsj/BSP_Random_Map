@@ -92,6 +92,9 @@ int main()
 				NewMap->Print();
 				std::cout << std::endl;
 			}
+			else {
+				printf_s("Err");
+			}
 
 			delete NewMap;
 			NewMap = nullptr;
