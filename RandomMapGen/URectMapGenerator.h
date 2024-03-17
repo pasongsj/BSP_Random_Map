@@ -49,6 +49,11 @@ public:
 		}
 	}
 
+	bool GetIsDone()
+	{
+		return isDone;
+	}
+
 protected:
 
 	virtual bool CreateMap();
@@ -128,6 +133,9 @@ protected:
 		// 공간내에 만들 방의 모양 리스트
 	std::vector<RoomType> RoomTypeList;
 	std::set<RoomType>	IgnoreRoomType;
+
+	// 맵 생성이 완료되었는지?
+	bool isDone;
 
 private:
 	

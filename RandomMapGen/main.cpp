@@ -76,7 +76,7 @@ int main()
 		{
 			GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
-			if (true == NewMap->CreateMap(Map, 15, 5, 1, MapShape::none))
+			if (true == NewMap->CreateMap(Map, 15, 5, 2, MapShape::none))
 			{
 				NewMap->Print();
 				std::cout << std::endl;
