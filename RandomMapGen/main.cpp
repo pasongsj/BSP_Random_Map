@@ -50,21 +50,11 @@ int main()
 		switch (EType)
 		{
 		case EMapType::Wall:
-		{
-			NewMap = new URectWallMapGenerator();
-			break;
-		}
 		case EMapType::Room:
-		{
-			NewMap = new URectRoomMapGenerator();
-			break;
-		}
 		case EMapType::Cave:
-		{
-			NewMap = new URectCaveMapGenerator();
 			break;
-		}
 		default:
+			return 0;
 			break;
 		}
 
@@ -76,15 +66,6 @@ int main()
 		{
 			GameEngineRandom::MainRandom.SetSeed(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
 
-			if (true == NewMap->CreateMap(Map, 15, 5, 2, MapShape::none))
-			{
-				NewMap->Print();
-				std::cout << std::endl;
-			}
-
-			delete NewMap;
-			NewMap = nullptr;
-			
 			switch (EType)
 			{
 			case EMapType::Wall:
@@ -105,6 +86,16 @@ int main()
 			default:
 				break;
 			}
+
+			if (true == NewMap->CreateMap(Map, 15, 5, 2, MapShape::none))
+			{
+				NewMap->Print();
+				std::cout << std::endl;
+			}
+
+			delete NewMap;
+			NewMap = nullptr;
+			
 			
 		}
 
