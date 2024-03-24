@@ -41,6 +41,8 @@ private:
 	// ¹æ ¿¬°á
 	bool ConnectRoom(Node* main_node, Node* sub_node = nullptr);
 
+	bool CheckExistPassage(RectInt _Rect);
+
 
 
 };

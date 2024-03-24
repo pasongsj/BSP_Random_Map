@@ -12,12 +12,12 @@
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	std::vector<std::vector<EMapGeneratorData>> Map(50, std::vector< EMapGeneratorData>(50, EMapGeneratorData::Ground));
+	std::vector<std::vector<EMapGeneratorData>> Map(40, std::vector< EMapGeneratorData>(40, EMapGeneratorData::Ground));
 
 	//int* a = new int();
 	// 
 	// 
-	int rate = 15;
+	int rate = 10;
 	for (int i = 0; i < rate; ++i)
 	{
 		for (int j = 0; j < rate; ++j)
@@ -87,7 +87,7 @@ int main()
 				break;
 			}
 
-			if (true == NewMap->CreateMap(Map, 15, 5, 2, MapShape::none))
+			if (true == NewMap->CreateMap(Map, 30, 5, 1, MapShape::none))
 			{
 				NewMap->Print();
 				std::cout << std::endl;
