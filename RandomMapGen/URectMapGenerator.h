@@ -24,6 +24,7 @@ public:
 	void Print();
 
 	virtual bool CreateMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int _roomcnt, int _min_room_size, int _doorsize, MapShape _shape = MapShape::none) = 0;
+	virtual bool CreateCaveMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int GroundPercent, MapShape _shape = MapShape::none) { return false; };
 
 	void SettingMapShap();
 

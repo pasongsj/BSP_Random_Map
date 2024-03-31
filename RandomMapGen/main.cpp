@@ -87,15 +87,37 @@ int main()
 				break;
 			}
 
-			if (true == NewMap->CreateMap(Map, 30, 5, 1, MapShape::none))
-			{
-				NewMap->Print();
-				std::cout << std::endl;
-			}
-			else {
-				printf_s("Err");
-			}
 
+			switch (EType)
+			{
+			case EMapType::Wall:
+			case EMapType::Room:
+			{
+				if (true == NewMap->CreateMap(Map, 30, 5, 1, MapShape::none))
+				{
+					NewMap->Print();
+					std::cout << std::endl;
+				}
+				else {
+					printf_s("Err");
+				}
+				break;
+			}
+			case EMapType::Cave:
+			{
+				if (true == NewMap->CreateCaveMap(Map,70, MapShape::none))
+				{
+					NewMap->Print();
+					std::cout << std::endl;
+				}
+				else {
+					printf_s("Err");
+				}
+				break;
+			}
+			default:
+				break;
+			}
 			delete NewMap;
 			NewMap = nullptr;
 			

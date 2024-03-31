@@ -197,6 +197,29 @@ bool URectCaveMapGenerator::CreateMap(const std::vector<std::vector<EMapGenerato
     return false;
 }
 
+
+bool URectCaveMapGenerator::CreateCaveMap(const std::vector<std::vector<EMapGeneratorData>>& _map, int GroundPercent, MapShape _shape)
+{
+    isDone = false;
+    base_map = _map;
+
+    lx = static_cast<int>(_map.size());
+    ly = static_cast<int>(_map[0].size());
+
+
+    spare = 0.8f;
+    CurMapShape = _shape;
+
+
+    if (true == URectCaveMapGenerator::CreateMap())
+    {
+        return isDone = true, true;
+    }
+    isDone = true;
+    return false;
+}
+
+
 void URectCaveMapGenerator::ApplyRules()
 {
     iter_map.resize(lx);
