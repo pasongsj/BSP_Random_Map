@@ -17,17 +17,17 @@ int main()
 	//int* a = new int();
 	// 
 	// 
-	int rate = 10;
-	for (int i = 0; i < rate; ++i)
-	{
-		for (int j = 0; j < rate; ++j)
-		{
-			Map[i][j] = EMapGeneratorData::VoidTile;
-			Map[i][Map[0].size()-j-1] = EMapGeneratorData::VoidTile;
-			Map[Map.size()-1-i][j] = EMapGeneratorData::VoidTile;
-			Map[Map.size()-1-i][Map[0].size() - j - 1] = EMapGeneratorData::VoidTile;
-		}
-	}
+	//int rate = 10;
+	//for (int i = 0; i < rate; ++i)
+	//{
+	//	for (int j = 0; j < rate; ++j)
+	//	{
+	//		Map[i][j] = EMapGeneratorData::VoidTile;
+	//		Map[i][Map[0].size()-j-1] = EMapGeneratorData::VoidTile;
+	//		Map[Map.size()-1-i][j] = EMapGeneratorData::VoidTile;
+	//		Map[Map.size()-1-i][Map[0].size() - j - 1] = EMapGeneratorData::VoidTile;
+	//	}
+	//}
 
 
 	URectMapGenerator* NewMap = nullptr;
@@ -93,7 +93,7 @@ int main()
 			case EMapType::Wall:
 			case EMapType::Room:
 			{
-				if (true == NewMap->CreateMap(Map, 30, 5, 1, MapShape::none))
+				if (true == NewMap->CreateMap(Map, 40, 5, 1, MapShape::none))
 				{
 					NewMap->Print();
 					std::cout << std::endl;
@@ -105,7 +105,7 @@ int main()
 			}
 			case EMapType::Cave:
 			{
-				if (true == NewMap->CreateCaveMap(Map,70, MapShape::none))
+				if (true == NewMap->CreateCaveMap(Map,20, MapShape::none)) 
 				{
 					NewMap->Print();
 					std::cout << std::endl;

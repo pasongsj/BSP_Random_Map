@@ -105,11 +105,15 @@ bool URectCaveMapGenerator::ValidCheck()
 
 bool URectCaveMapGenerator::CreateMap()
 {
-    URectMapGenerator::CreateMap();
-    if (min_room_size < 10 || min_room_size > 90)
+    if (min_room_size > 70)
     {
-        min_room_size = 50;
+        min_room_size = 70;
     }
+    if (min_room_size < 20)
+    {
+        min_room_size = 20;
+    }
+    URectMapGenerator::CreateMap();
     CpyMap();
 
     // 맵 생성 트라이
@@ -206,7 +210,7 @@ bool URectCaveMapGenerator::CreateCaveMap(const std::vector<std::vector<EMapGene
     lx = static_cast<int>(_map.size());
     ly = static_cast<int>(_map[0].size());
 
-
+    min_room_size = GroundPercent;
     spare = 0.8f;
     CurMapShape = _shape;
 
@@ -312,14 +316,23 @@ void URectCaveMapGenerator::Setting()
                     break;
                 }
             }
-            if (true == is_def || 0 == GameEngineRandom::MainRandom.RandomInt(0, 2))
+            int RandomDot;
+            if (min_room_size < 50)
             {
-                try_map_gen[i][j] = EMapGeneratorData::Wall;
+                RandomDot = GameEngineRandom::MainRandom.RandomInt(0, 4);// 0 1 2 3 4
             }
             else
             {
-                try_map_gen[i][j] = EMapGeneratorData::Ground;
+                RandomDot = GameEngineRandom::MainRandom.RandomInt(0, 3); // 0 1 2 3 4 5
             }
+			if (true == is_def || RandomDot <= 1)
+			{
+				try_map_gen[i][j] = EMapGeneratorData::Wall;
+			}
+			else
+			{
+				try_map_gen[i][j] = EMapGeneratorData::Ground;
+			}
 
         }
     }
